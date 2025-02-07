@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block ttile %}Регистрация{% endblock ttile %}
+
+{% block content %}
+<h1>Регистрация</h1>
+
+<form action="{% url "register" %}" method='post'>
+{{form}}
+{% csrf_token %}
+<button type="submit">Далее</button>
+</form>
+{% endblock content %}

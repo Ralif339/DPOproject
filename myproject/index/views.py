@@ -1,5 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.contrib.auth.forms import UserCreationForm
+from .forms import RegisterForm
+from django.contrib.auth import login
+
 
 # Create your views here.
 def index_view(request):
@@ -7,5 +10,12 @@ def index_view(request):
 
 
 def register_view(request):
-    context = {'form': UserCreationForm()}
-    return render(request, 'registration/register.html', context=context)
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('index')
+    else:
+        form = RegisterForm()
+    return render(request, 'registration/register.html', context={'form': form})

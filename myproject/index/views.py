@@ -6,7 +6,13 @@ from django.contrib.auth import login
 
 # Create your views here.
 def index_view(request):
-    return render(request, 'index/index.html')
+    if request.user.is_superuser:
+        return render(request, 'index/manager.html')
+    else:
+        if request.user.is_authenticated:
+            return render(request, 'index/student.html')
+        else:
+            return render(request, 'index/greeting.html')
 
 
 def register_view(request):

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Приветстенная страница{% endblock title %}
+
+{% block content %}
+
+<h1>Привет</h1>
+
+<a class="btn btn-primary" href="{% url "login" %}">Войти</a> | 
+<a class="btn btn-primary" href="{% url "register" %}">Регистрация</a>
+
+{% endblock content %}

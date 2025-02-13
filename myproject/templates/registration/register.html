@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block ttile %}Регистрация{% endblock ttile %}
+{% block title %}Регистрация{% endblock title %}
 
 {% block content %}
 <h1>Регистрация</h1>
@@ -9,6 +9,6 @@
     {% csrf_token %}
 
     {{form.as_p}}
-<button type="submit">Далее</button>
+<button class="btn btn-success" class="btn btn-success" type="submit">Далее</button>
 </form>
 {% endblock content %}

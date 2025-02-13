@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'index',
+    'dpo',
 ]
 
 AUTH_USER_MODEL = 'index.User'

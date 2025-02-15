@@ -2,6 +2,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.forms import UserCreationForm
 from .forms import RegisterForm
 from django.contrib.auth import login
+from . import forms
 
 
 # Create your views here.
@@ -10,9 +11,11 @@ def index_view(request):
         return render(request, 'index/manager.html')
     else:
         if request.user.is_authenticated:
-            return render(request, 'index/student.html')
+            form = forms.StudentInfoForm()
+            return render(request, 'index/student.html', context={"form": form})
         else:
             return render(request, 'index/greeting.html')
+        
 
 
 def register_view(request):

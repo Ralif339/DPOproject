@@ -13,3 +13,12 @@ class RegisterForm(UserCreationForm):
         fields = [
             'email', 'password1', 'password2'
         ]
+        
+
+class StudentInfoForm(forms.ModelForm):
+    
+    class Meta:
+        model = User
+        fields = ["name", "surname", "patronymic", 
+                  "birthday", "SNILS", "passport",
+                  "phone"]

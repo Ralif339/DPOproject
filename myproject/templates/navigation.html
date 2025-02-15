@@ -1,11 +1,32 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{% endblock title %}
 
 {% block content %}
-
-
-
+<div class="container">
+    <div class="row align-items-center">
+        <div class="col col-md-auto">
+            <img src="{% static "img/logo.png" %}" width="70px" height="70px" alt="">   
+            Центр ДПО
+        </div>
+        <div class="col d-flex justify-content-around">
+            <a href="{% url "students" %}">Слушатели</a> 
+            <a href="{% url "groups" %}">Группы</a>
+            <a href="{% url "statements" %}">Заявления</a>
+            <a href="{% url "commission" %}">Комиссия</a>
+            {% if user.is_authenticated %}
+            <form id="logout-form" action="{% url "logout" %}" method="post">
+                {% csrf_token %}
+                <button class="btn btn-danger" type='submit'>Выйти</button>
+            </form>
+            {% else %}
+            <a class="btn btn-primary" href="{% url "login" %}">Войти</a> | 
+            <a class="btn btn-primary" href="{% url "register" %}">Регистрация</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
 
 
 {% block contents %}{% endblock contents %}

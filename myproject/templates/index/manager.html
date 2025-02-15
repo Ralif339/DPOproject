@@ -1,22 +1,14 @@
-{% extends "base.html" %}
+{% extends "navigation.html" %}
 
 {% block title %}Домашняя{% endblock title %}
 
-{% block content %}
+{% block contents %}
 <div class="container">
     <h1>Домашняя страница</h1>
     <ul>
         <li>Заведующий {{ user }}</li>
         <li><a href="{% url 'index' %}">Home</a></li>
     </ul>
-    {% if user.is_authenticated %}
-    <form id="logout-form" action="{% url "logout" %}" method="post">
-        {% csrf_token %}
-        <button class="btn btn-danger" type='submit'>Выйти</button>
-    </form>
-    {% else %}
-    <a class="btn btn-primary" href="{% url "login" %}">Войти</a> | 
-    <a class="btn btn-primary" href="{% url "register" %}">Регистрация</a>
-    {% endif %}
+    
 </div>
-{% endblock content %}
+{% endblock contents %}

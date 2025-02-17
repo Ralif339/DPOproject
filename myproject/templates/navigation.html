@@ -15,7 +15,8 @@
             <a href="{% url "groups" %}">Группы</a>
             <a href="{% url "statements" %}">Заявления</a>
             <a href="{% url "commission" %}">Комиссия</a>
-            {% if user.is_authenticated %}
+        </div>
+        <div class="col col-md-auto">{% if user.is_authenticated %}
             <form id="logout-form" action="{% url "logout" %}" method="post">
                 {% csrf_token %}
                 <button class="btn btn-danger" type='submit'>Выйти</button>
@@ -23,8 +24,7 @@
             {% else %}
             <a class="btn btn-primary" href="{% url "login" %}">Войти</a> | 
             <a class="btn btn-primary" href="{% url "register" %}">Регистрация</a>
-            {% endif %}
-        </div>
+            {% endif %}</div>
     </div>
 </div>
 

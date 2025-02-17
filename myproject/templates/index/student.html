@@ -3,24 +3,17 @@
 {% block title %}Домашняя страница{% endblock title %}
 
 {% block content %}
-<h1>Домашняя страница</h1>
-    <ul>
-        <li>Слушатель {{ user }}</li>
-        <li><a href="{% url 'index' %}">Home</a></li>
-    </ul>
-    {% if user.is_authenticated %}
-    <form id="logout-form" action="{% url "logout" %}" method="post">
-        {% csrf_token %}
-        <button class="btn btn-danger" type='submit'>Выйти</button>
-    </form>
-    {% else %}
-    <a class="btn btn-primary" href="{% url "login" %}">Войти</a> | 
-    <a class="btn btn-primary" href="{% url "register" %}">Регистрация</a>
-    {% endif %}
+<div class="container">
+    <h1>Домашняя страница</h1>
+        <ul>
+            <li>Слушатель {{ user }}</li>
+            <li><a href="{% url 'index' %}">Home</a></li>
+        </ul>
 
-    <form method="post" action="{% url "index" %}" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form }}
-        <input type="submit" value="Подтвердить">
-    </form>
+        <form method="post" action="{% url "index" %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Подтвердить">
+        </form>
+</div>
 {% endblock content %}

@@ -11,6 +11,11 @@ def index_view(request):
         return render(request, 'index/manager.html')
     else:
         if request.user.is_authenticated:
+            if request.method == "POST":
+                form = forms.StudentInfoForm(request.POST)
+                if form.is_valid():
+                    form.save()
+                    return redirect('index')
             form = forms.StudentInfoForm()
             return render(request, 'index/student.html', context={"form": form})
         else:

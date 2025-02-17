@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from .forms import RegisterForm
 from django.contrib.auth import login
 from . import forms
+from .models import User
 
 
 # Create your views here.
@@ -12,7 +13,7 @@ def index_view(request):
     else:
         if request.user.is_authenticated:
             if request.method == "POST":
-                form = forms.StudentInfoForm(request.POST)
+                form = forms.StudentInfoForm(request.POST, instance=request.user)
                 if form.is_valid():
                     form.save()
                     return redirect('index')

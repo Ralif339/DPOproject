@@ -1,8 +1,9 @@
-{% extends "navigation.html" %}
+{% extends "manager_navigation.html" %}
+{% load static %}
 
 {% block title %}Студенты{% endblock title %}
 
-{% block contents %}
+{% block content %}
 <div class="container">
     {% for student in students %}
         <div class="row align-items-center">
@@ -21,4 +22,4 @@
         </div>
     {% endfor %}
 </div>
-{% endblock contents %}
+{% endblock content %}

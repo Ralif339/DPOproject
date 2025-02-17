@@ -3,7 +3,7 @@
 
 {% block title %}{% endblock title %}
 
-{% block content %}
+{% block navigation %}
 <div class="container">
     <div class="row align-items-center">
         <div class="col col-md-auto">
@@ -16,7 +16,8 @@
             <a href="{% url "statements" %}">Заявления</a>
             <a href="{% url "commission" %}">Комиссия</a>
         </div>
-        <div class="col col-md-auto">{% if user.is_authenticated %}
+        <div class="col col-md-auto">
+            {% if user.is_authenticated %}
             <form id="logout-form" action="{% url "logout" %}" method="post">
                 {% csrf_token %}
                 <button class="btn btn-danger" type='submit'>Выйти</button>
@@ -27,8 +28,6 @@
             {% endif %}</div>
     </div>
 </div>
+{% endblock navigation %}
 
 
-{% block contents %}{% endblock contents %}
-
-{% endblock content %}

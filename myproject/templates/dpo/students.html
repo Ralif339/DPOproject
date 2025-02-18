@@ -5,21 +5,44 @@
 
 {% block content %}
 <div class="container">
-    {% for student in students %}
-        <div class="row align-items-center">
-            <div class="col"><img src="{% static "img/logo.png" %}" width="70px" height="70px" alt=""></div>
-            <div class="col-md-auto">
-                <div class="row">
-                    <div class="col d-flex flex-column">
-                        <p>{{students.name}}</p>
-                        <p>{{students.surname}}</p>
-                        <p>{{students.patronymic}}</p>
-                    </div>
-                    <div class="col"></div>
-                </div>
+    <div class="row mt-3">
+        <div class="col col-2"></div>
+        <div class="col col-10">Поиск</div>
+    </div>
+    <div class="row mt-3">
+        <div class="col col-2">
+            <div class="row">Фильтрация</div>
+            <div class="row d-flex flex-column">
+                
             </div>
-            <div class="col"></div>
         </div>
-    {% endfor %}
+        <div class="col col-10">
+            {% for student in students %}
+                <div class="row align-items-center border mb-3">
+                    <div class="col col-md-auto"><img src="{% static "img/logo.png" %}" width="150px" height="150px" alt=""></div>
+                    <div class="col">
+                        <div class="row pt-2">
+                            <div class="col col-md-auto d-flex flex-column">
+                                <p>ФИО: {{student.surname}} {{student.name}} {{student.patronymic}}</p>
+                                <p>Статус: {{student.status}}</p>
+                                <p>День рождения: {{student.birthday}}</p>
+                                <p>СНИЛС: {{student.SNILS}}</p>
+                            </div>
+                            <div class="col col-md-auto d-flex flex-column">
+                                <p>Группа: </p>
+                                <p>Телефон: {{student.phone}}</p>
+                                <p>Почта: {{student.email}}</p>
+                                <p>Паспорт: {{student.passport}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col col-md-auto d-flex flex-column gap-3">
+                        <a href="#" class="btn btn-primary">Перейти</a>
+                        <a href="#" class="btn btn-primary">Изменить</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 {% endblock content %}

@@ -48,3 +48,8 @@ class GroupCommission(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name="Группа")
     commission_member = models.ForeignKey(CommissionMember, on_delete=models.CASCADE, verbose_name="Член комиссии")
     role = models.CharField(max_length=128, verbose_name="Роль")
+    
+class Statements(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Слушатель")
+    statement_type = models.CharField(max_length=128, verbose_name="Тип заявления")
+    submitting_date = models.DateField(verbose_name="Дата подачи")

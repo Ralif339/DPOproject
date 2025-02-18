@@ -35,8 +35,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     SNILS = models.CharField(max_length=15, blank=True, default='')
     passport = models.CharField(max_length=15, blank=True, default='')
     phone = models.CharField(max_length=255, blank=True, default='')
-    status = models.CharField(max_length=255, blank=True, default='')
-    ed_kind = models.CharField(max_length=255, blank=True, default='')
+    status = models.CharField(max_length=255, blank=True, default='Не зачислен')
+    ed_kind = models.CharField(max_length=255, blank=True, default='Нет')
         
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)

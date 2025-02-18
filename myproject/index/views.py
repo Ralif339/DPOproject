@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, render
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 from .forms import RegisterForm
 from django.contrib.auth import login
 from . import forms
@@ -20,9 +20,8 @@ def index_view(request):
             form = forms.StudentInfoForm()
             return render(request, 'index/student.html', context={"form": form})
         else:
-            return render(request, 'index/greeting.html')
+            return redirect('login')
         
-
 
 def register_view(request):
     if request.method == "POST":

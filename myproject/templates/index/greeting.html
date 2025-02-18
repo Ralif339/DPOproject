@@ -1,9 +1,18 @@
-{% extends "navigation.html" %}
+{% extends "base.html" %}
 
 {% block title %}Приветстенная страница{% endblock title %}
 
 {% block content %}
 
 <h1>Привет</h1>
+<h1>Вход</h1>
 
+{% if form.errors %}
+    <p>{{ form.errors.error }}</p>
+{% endif %}
+<form action="{% url "login" %}" method="post">
+{{form}}
+{% csrf_token %}
+<button class="btn btn-primary" type="submit">Войти</button>
+</form> 
 {% endblock content %}

@@ -3,14 +3,19 @@
 {% block title %}Вход{% endblock title %}
 
 {% block content %}
-<h1>Вход</h1>
+<div class="container">
+    <div class="mx-auto" style="width: auto;">
+        <h1>Вход</h1>
 
-{% if form.errors %}
-    <p>{{ form.errors.error }}</p>
-{% endif %}
-<form action="{% url "login" %}" method="post">
-{{form}}
-{% csrf_token %}
-<button class="btn btn-primary" type="submit">Войти</button>
-</form>
+        {% if form.errors %}
+            <p>{{ form.errors.error }}</p>
+        {% endif %}
+        <form action="{% url "login" %}" method="post">
+        {{form}}
+        {% csrf_token %}
+        <button class="btn btn-primary" type="submit">Войти</button>
+        </form>
+        <a href="{% url "register" %}">Регистрация</a>
+    </div>
+</div>
 {% endblock content %}

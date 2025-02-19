@@ -33,3 +33,4 @@ def register_view(request):
     else:
         form = RegisterForm()
     return render(request, 'registration/register.html', context={'form': form})
+

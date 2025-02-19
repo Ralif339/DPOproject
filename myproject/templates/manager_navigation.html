@@ -3,31 +3,47 @@
 
 {% block title %}{% endblock title %}
 
+{% block style %}
+
+{% endblock style %}
+
 {% block navigation %}
 <div class="container mt-2">
     <div class="row align-items-center">
         <div class="col col-md-auto">
-            <img src="{% static "img/logo.png" %}" width="70px" height="70px" alt="">   
+            <img src="{% static 'img/logo.png' %}" width="70px" height="70px" alt="">   
             Центр ДПО
         </div>
         <div class="col d-flex justify-content-around">
-            <a href="{% url "students" %}">Слушатели</a> 
-            <a href="{% url "groups" %}">Группы</a>
-            <a href="{% url "statements" %}">Заявления</a>
-            <a href="{% url "commission" %}">Комиссия</a>
+            <a href="{% url 'students' %}" class="nav-link nav-item">Слушатели</a> 
+            <a href="{% url 'groups' %}" class="nav-link nav-item">Группы</a>
+            <a href="{% url 'statements' %}" class="nav-link nav-item">Заявления</a>
+            <a href="{% url 'commission' %}" class="nav-link nav-item">Комиссия</a>
         </div>
         <div class="col col-md-auto">
-            {% if user.is_authenticated %}
-            <form id="logout-form" action="{% url "logout" %}" method="post">
-                {% csrf_token %}
-                <button class="btn btn-danger" type='submit'>Выйти</button>
-            </form>
-            {% else %}
-            <a class="btn btn-primary" href="{% url "login" %}">Войти</a> | 
-            <a class="btn btn-primary" href="{% url "register" %}">Регистрация</a>
-            {% endif %}</div>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                    Меню
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="userMenu">
+                    <li><a class="dropdown-item" href="{% url 'orders' %}">Приказы</a></li>
+                    <li><a class="dropdown-item" href="{% url 'courses' %}">Курсы</a></li>
+                    <li><a class="dropdown-item" href="{% url 'teachers' %}">Преподаватели</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        {% if user.is_authenticated %}
+                        <form id="logout-form" action="{% url 'logout' %}" method="post">
+                            {% csrf_token %}
+                            <button class="dropdown-item text-danger" type="submit">Выйти</button>
+                        </form>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
+
 {% endblock navigation %}
 
 

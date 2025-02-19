@@ -1,12 +1,136 @@
 {% extends "manager_navigation.html" %}
 {% load static %}
 
+{% block style %}
+<style>
+    body {
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+    .sidebar {;
+        padding: 15px;
+        border-radius: 10px;
+    }
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        height: 100%; /* Растягиваем карточку */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .btn-add {
+        background-color: #28a745;
+        color: white;
+    }
+    .btn-add:hover {
+        background-color: #218838;
+    }
+    .btn-edit {
+        background-color: #ffc107;
+        color: black;
+    }
+    .btn-edit:hover {
+        background-color: #e0a800;
+    }
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+    }
+    .btn-delete:hover {
+        background-color: #c82333;
+    }
+</style>
+{% endblock style %}
+
 {% block title %}Курсы{% endblock title %}
 
 {% block content %}
-<div class="container">
-    <h1>Курсы</h1>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Список курсов</h2>
 
+    <div class="row">
+        <!-- Фильтрация (слева) -->
+        <div class="col-md-3">
+            <button class="btn btn-add w-100 mb-2" onclick="addCourse()">Добавить курс</button>
+            <div class="sidebar">
+                <h6>Фильтрация</h6>
+                <input type="text" class="form-control mb-2" placeholder="Поиск по названию">
+                
+                <label class="mt-2">Тип курса</label>
+                <select class="form-select">
+                    <option value="">Все</option>
+                    <option value="Онлайн">Онлайн</option>
+                    <option value="Офлайн">Офлайн</option>
+                </select>
+
+                <label class="mt-2">Количество часов</label>
+                <select class="form-select">
+                    <option value="">Все</option>
+                    <option value="10">10 часов</option>
+                    <option value="20">20 часов</option>
+                    <option value="30">30 часов</option>
+                </select>
+
+                
+            </div>
+        </div>
+
+        <!-- Карточки курсов -->
+        <div class="col-md-9">
+            <div class="row row-cols-1 row-cols-md-3 g-4" id="coursesList">
+                <!-- Карточка 1 -->
+                <div class="col">
+                    <div class="card p-3">
+                        <div>
+                            <h5 class="card-title">Frontend-разработка</h5>
+                            <p><strong>Тип:</strong> Онлайн</p>
+                            <p><strong>Стоимость:</strong> 30 000 руб.</p>
+                            <p><strong>Количество часов:</strong> 40 часов</p>
+                        </div>
+                        <div class="mt-auto">
+                            <button class="btn btn-edit w-100 mb-2">Редактировать</button>
+                            <button class="btn btn-delete w-100">Удалить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карточка 2 -->
+                <div class="col">
+                    <div class="card p-3">
+                        <div>
+                            <h5 class="card-title">Backend-разработка</h5>
+                            <p><strong>Тип:</strong> Офлайн</p>
+                            <p><strong>Стоимость:</strong> 35 000 руб.</p>
+                            <p><strong>Количество часов:</strong> 50 часов</p>
+                        </div>
+                        <div class="mt-auto">
+                            <button class="btn btn-edit w-100 mb-2">Редактировать</button>
+                            <button class="btn btn-delete w-100">Удалить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Карточка 3 -->
+                <div class="col">
+                    <div class="card p-3">
+                        <div>
+                            <h5 class="card-title">Data Science</h5>
+                            <p><strong>Тип:</strong> Онлайн</p>
+                            <p><strong>Стоимость:</strong> 50 000 руб.</p>
+                            <p><strong>Количество часов:</strong> 60 часов</p>
+                        </div>
+                        <div class="mt-auto">
+                            <button class="btn btn-edit w-100 mb-2">Редактировать</button>
+                            <button class="btn btn-delete w-100">Удалить</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>
 
 {% endblock content %}

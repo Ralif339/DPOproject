@@ -1,3 +1,10 @@
-.s {
-    vertical-align: middle;
+.nav-link {
+    text-decoration: none !important;
+    color: black !important;
+    transition: all 0.3s ease-in-out !important;
+}
+
+.nav-link:hover {
+    text-decoration: underline !important;
+    text-decoration-color: #9999FF !important;
 }

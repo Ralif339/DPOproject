@@ -1,12 +1,94 @@
 {% extends "manager_navigation.html" %}
 {% load static %}
 
+{% block style %}
+    <style>
+        .btn-primary {
+            background-color:rgb(125, 125, 255);
+            border-color: rgb(125, 125, 255);
+        }
+        .btn-primary:hover {
+            background-color: #7777DD;
+            border-color: #7777DD;
+        }
+    </style>
+{% endblock style %}
+
 {% block title %}Группы{% endblock title %}
 
 {% block content %}
-<div class="container">
-    <h1>Группы</h1>
+<div class="container mt-4">
+    <h2 class="text-center">Группы слушателей</h2>
 
+    <!-- Поиск и фильтры -->
+    <div class="row my-3">
+        <div class="col-md-4">
+            <input type="text" class="form-control" id="search" placeholder="Поиск по курсу...">
+        </div>
+        <div class="col-md-2">
+            <select class="form-select" id="filterType">
+                <option value="">Тип курса</option>
+                <option value="Онлайн">Онлайн</option>
+                <option value="Офлайн">Офлайн</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select class="form-select" id="filterTeacher">
+                <option value="">Преподаватель</option>
+                <option value="Иванов И.И.">Иванов И.И.</option>
+                <option value="Петров П.П.">Петров П.П.</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select class="form-select" id="filterDuration">
+                <option value="">Срок обучения</option>
+                <option value="1 месяц">1 месяц</option>
+                <option value="3 месяца">3 месяца</option>
+                <option value="6 месяцев">6 месяцев</option>
+            </select>
+        </div>
+        <div class="col-md-2 text-end">
+            <a class="btn btn-primary" href="{% url "group_add" %}">Добавить группу</a>
+        </div>
+    </div>
+
+    <!-- Таблица -->
+    <table class="table table-bordered text-center">
+        <thead class="table-light">
+            <tr>
+                <th>Название курса</th>
+                <th>ФИО преподавателя</th>
+                <th>Срок обучения</th>
+                <th>Кол-во человек</th>
+                <th>Тип курса</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody id="groupTable">
+            <tr>
+                <td>Frontend-разработка</td>
+                <td>Иванов И.И.</td>
+                <td>3 месяца</td>
+                <td>15</td>
+                <td>Онлайн</td>
+                <td>
+                    <button class="btn btn-sm btn-warning" onclick="editGroup()">✏️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteGroup()">🗑</button>
+                </td>
+            </tr>
+            <tr>
+                <td>Backend-разработка</td>
+                <td>Петров П.П.</td>
+                <td>6 месяцев</td>
+                <td>10</td>
+                <td>Офлайн</td>
+                <td>
+                    <button class="btn btn-sm btn-warning" onclick="editGroup()">✏️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteGroup()">🗑</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 
 {% endblock content %}

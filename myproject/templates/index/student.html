@@ -1,19 +1,11 @@
-{% extends "base.html" %}
+{% extends "student_navigation.html" %}
 
 {% block title %}Домашняя страница{% endblock title %}
 
 {% block content %}
 <div class="container">
-    <h1>Домашняя страница</h1>
         <ul>
             <li>Слушатель {{ user }}</li>
-            <li><a href="{% url 'index' %}">Home</a></li>
-            {% if user.is_authenticated %}
-            <form id="logout-form" action="{% url "logout" %}" method="post">
-                {% csrf_token %}
-                <button class="btn btn-danger" type='submit'>Выйти</button>
-            </form>
-            {% endif %}
         </ul>
 
         <form method="post" action="{% url "index" %}" enctype="multipart/form-data">

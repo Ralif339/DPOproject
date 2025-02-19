@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from index.models import User
+from .forms import GroupAddForm
 
 
 def superuser_render(request, template: str, context=None):
@@ -33,3 +34,13 @@ def teachers_view(request):
 
 def courses_view(request):
     return superuser_render(request, 'dpo/courses.html')
+
+def add_group_view(request):
+    if request.method == "POST":
+        form = GroupAddForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('groups')
+    else:
+        form = GroupAddForm()
+    return superuser_render(request, 'dpo/group_add.html', context={'form': form})

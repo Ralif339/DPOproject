@@ -53,7 +53,7 @@
     <div class="row">
         <!-- Фильтрация (слева) -->
         <div class="col-md-3">
-            <button class="btn btn-add w-100 mb-2" onclick="addCourse()">Добавить курс</button>
+            <a class="btn btn-add w-100 mb-2" href="{% url "course_add" %}">Добавить курс</a>
             <div class="sidebar">
                 <h6>Фильтрация</h6>
                 <input type="text" class="form-control mb-2" placeholder="Поиск по названию">
@@ -80,14 +80,15 @@
         <!-- Карточки курсов -->
         <div class="col-md-9">
             <div class="row row-cols-1 row-cols-md-3 g-4" id="coursesList">
+                {% for course in courses %}
                 <!-- Карточка 1 -->
                 <div class="col">
                     <div class="card p-3">
                         <div>
-                            <h5 class="card-title">Frontend-разработка</h5>
-                            <p><strong>Тип:</strong> Онлайн</p>
-                            <p><strong>Стоимость:</strong> 30 000 руб.</p>
-                            <p><strong>Количество часов:</strong> 40 часов</p>
+                            <h5 class="card-title">{{ course.course_name }}</h5>
+                            <p><strong>Тип:</strong> {{ course.course_type}}</p>
+                            <p><strong>Стоимость:</strong> {{ course.price|floatformat:2|default:"0.00" }} руб.</p>
+                            <p><strong>Количество часов:</strong> {{ course.hours_count}} ч.</p>
                         </div>
                         <div class="mt-auto">
                             <button class="btn btn-edit w-100 mb-2">Редактировать</button>
@@ -95,39 +96,7 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Карточка 2 -->
-                <div class="col">
-                    <div class="card p-3">
-                        <div>
-                            <h5 class="card-title">Backend-разработка</h5>
-                            <p><strong>Тип:</strong> Офлайн</p>
-                            <p><strong>Стоимость:</strong> 35 000 руб.</p>
-                            <p><strong>Количество часов:</strong> 50 часов</p>
-                        </div>
-                        <div class="mt-auto">
-                            <button class="btn btn-edit w-100 mb-2">Редактировать</button>
-                            <button class="btn btn-delete w-100">Удалить</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Карточка 3 -->
-                <div class="col">
-                    <div class="card p-3">
-                        <div>
-                            <h5 class="card-title">Data Science</h5>
-                            <p><strong>Тип:</strong> Онлайн</p>
-                            <p><strong>Стоимость:</strong> 50 000 руб.</p>
-                            <p><strong>Количество часов:</strong> 60 часов</p>
-                        </div>
-                        <div class="mt-auto">
-                            <button class="btn btn-edit w-100 mb-2">Редактировать</button>
-                            <button class="btn btn-delete w-100">Удалить</button>
-                        </div>
-                    </div>
-                </div>
-
+                {% endfor %}
             </div>
         </div>
     </div>

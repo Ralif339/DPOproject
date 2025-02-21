@@ -1,0 +1,17 @@
+{% extends "manager_navigation.html" %}
+
+{% block title %}Добавление курса{% endblock title %}
+
+{% block content %} 
+<div class="container">
+    {% if form.errors %}
+            <p>{{ form.errors.error }}</p>
+    {% endif %}
+    <form action="{% url "course_add" %}" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-success" type="submit">Добавить</button>
+    </form>
+
+</div>
+{% endblock content %}

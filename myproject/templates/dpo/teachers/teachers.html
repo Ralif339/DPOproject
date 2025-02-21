@@ -1,0 +1,77 @@
+{% extends "manager_navigation.html" %}
+{% load static %}
+
+{% block title %}Преподаватели{% endblock title %}
+
+{% block style %}
+<style>
+    body {
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .btn-add {
+        background-color: #28a745;
+        color: white;
+    }
+    .btn-add:hover {
+        background-color: #218838;
+    }
+    .btn-edit {
+        background-color: #ffc107;
+        color: black;
+    }
+    .btn-edit:hover {
+        background-color: #e0a800;
+    }
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+    }
+    .btn-delete:hover {
+        background-color: #c82333;
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Преподаватели</h2>
+
+    <!-- Поле поиска и кнопка добавления -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <a class="btn btn-add w-100" href="{% url "teacher_add" %}">Добавить преподавателя</a>
+        </div>
+        <div class="col-md-9">
+            <input type="text" class="form-control" placeholder="Поиск по ФИО">
+        </div>
+        
+    </div>
+
+    <!-- Карточки преподавателей -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="teachersList">
+        {% for teacher in teachers %}
+        <div class="col">
+            <div class="card p-3 text-center">
+                <h5 class="card-title">{{ teacher.surname }} {{ teacher.name }} {{ teacher.patronymic }}</h5>
+                <p class="card-text">{{ teacher.position }}</p>
+                <div class="mt-auto">
+                    <button class="btn btn-edit w-100 mb-2">Редактировать</button>
+                    <button class="btn btn-delete w-100">Удалить</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}

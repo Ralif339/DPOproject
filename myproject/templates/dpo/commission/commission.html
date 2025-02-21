@@ -1,0 +1,78 @@
+{% extends "manager_navigation.html" %}
+{% load static %}
+
+{% block title %}Члены аттестационной комиссии{% endblock title %}
+
+{% block style %}
+<style>
+    body {
+        background-color: #FFFFFF;
+        color: #000000;
+    }
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .btn-add {
+        background-color: #28a745;
+        color: white;
+    }
+    .btn-add:hover {
+        background-color: #218838;
+    }
+    .btn-edit {
+        background-color: #ffc107;
+        color: black;
+    }
+    .btn-edit:hover {
+        background-color: #e0a800;
+    }
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+    }
+    .btn-delete:hover {
+        background-color: #c82333;
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Аттестационная комиссия</h2>
+
+    <!-- Поле поиска и кнопка добавления -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <a class="btn btn-add w-100" href="{% url "commission_add" %}">Добавить члена комиссии</a>
+        </div>
+        <div class="col-md-9">
+            <input type="text" class="form-control" placeholder="Поиск по ФИО">
+        </div>
+        
+    </div>
+
+    <!-- Карточки членов комиссии -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="commissionList">
+        <!-- Карточка 1 -->
+         {% for member in commission %}
+        <div class="col">
+            <div class="card p-3 text-center">
+                <h5 class="card-title">{{ member.surname }} {{ member.name }} {{ member.patronymic }}</h5>
+                <p class="card-text">{{ member.position }}</p>
+                <div class="mt-auto">
+                    <button class="btn btn-edit w-100 mb-2">Редактировать</button>
+                    <button class="btn btn-delete w-100">Удалить</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}

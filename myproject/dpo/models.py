@@ -2,15 +2,17 @@ from django.db import models
 from index.models import User
 
 # Create your models here.
-class CourseType(models.Model):
-    type_name = models.CharField(max_length=255, verbose_name="Имя типа курса")
-    
+   
     
 class Course(models.Model):
     course_name = models.CharField(max_length=255, verbose_name="Название курса")
-    course_type = models.ForeignKey(CourseType, on_delete=models.CASCADE, verbose_name="Тип курса")
+    course_type = models.CharField(max_length=255, verbose_name="Тип курса")
     price = models.FloatField(verbose_name="Цена")
     hours_count = models.IntegerField(verbose_name="Количество часов")
+    
+    class Meta: 
+        verbose_name = 'Курс'
+        verbose_name_plural = 'Курсы'
     
     
 class CommissionMember(models.Model):

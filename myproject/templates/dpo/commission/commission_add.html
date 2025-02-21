@@ -1,0 +1,22 @@
+{% extends "manager_navigation.html" %}
+{% load static %}
+
+{% block title %}Добавление члена комиссии{% endblock title %}
+
+{% block style %}
+
+{% endblock style %}
+
+{% block content %}
+
+    <div class="container">
+        <h2>Добавление члена комиссии</h2>
+        <p>Преподаватель?</p>
+        <form action="{% url "commission_add" %}" method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-success">Добавить</button>
+        </form>
+    </div>
+
+{% endblock content %}

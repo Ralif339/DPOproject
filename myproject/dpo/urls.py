@@ -11,4 +11,7 @@ urlpatterns = [
     path('teachers/', teachers_view, name="teachers"),
     path('courses/', courses_view, name="courses"),
     path('group_add/', add_group_view, name="group_add"),
+    path('course_add/', add_course_view, name="course_add"),
+    path('teacher_add/', add_teacher_view, name="teacher_add"),
+    path('commission_add/', add_commission_view, name="commission_add"),
 ]

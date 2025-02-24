@@ -10,8 +10,8 @@
             Центр ДПО
         </div>
         <div class="col d-flex justify-content-around">
-            <a href="{% url "students" %}">Личные данные</a> 
-            <a href="{% url "groups" %}">Подать заявление</a>
+            <a href="{% url "index" %}">Личные данные</a> 
+            <a href="{% url "new_statement" %}">Подать заявление</a>
         </div>
         <div class="col col-md-auto">
             {% if user.is_authenticated %}

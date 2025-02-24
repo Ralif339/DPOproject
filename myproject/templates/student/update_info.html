@@ -1,0 +1,16 @@
+{% extends "student_navigation.html" %}
+
+{% block title %}Изменение личных данных{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="mx-auto w-auto">
+            <h2>Изменение данных</h2>
+            <form action="{% url "update_info" %}" method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-success" type="submit">Подтвердить</button>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

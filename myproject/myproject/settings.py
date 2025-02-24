@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'index',
     'dpo',
+    'student',
 ]
 
 AUTH_USER_MODEL = 'index.User'

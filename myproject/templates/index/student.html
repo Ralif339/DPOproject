@@ -2,16 +2,82 @@
 
 {% block title %}Домашняя страница{% endblock title %}
 
+{% block style %}
+<style>
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .btn-edit {
+        background-color: #ffc107;
+        color: black;
+    }
+    .btn-edit:hover {
+        background-color: #e0a800;
+    }
+</style>
+{% endblock style %}
+
 {% block content %}
 <div class="container">
-        <ul>
-            <li>Слушатель {{ user }}</li>
-        </ul>
+        <p>Имя: {{ user.name }}</p>
+        <p>Фамилия: {{ user.surname }}</p>
+        <p>Отчество: {{ user.patronymic }}</p>
+        <p>Дата рождения: {{ user.birthday }}</p>
+        <p>СНИЛС: {{ user.SNILS }}</p>
+        <p>Паспорт: {{ user.passport }}</p>
+        <p>Статус: {{ user.status }}</p>
+        <p>Телефон: {{ user.phone }}</p>
 
-        <form method="post" action="{% url "index" %}" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <input type="submit" value="Подтвердить">
-        </form>
+        <a href="{% url "update_info" %}" class="btn btn-primary">Изменить</a>
+</div>
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Профиль слушателя</h2>
+
+    <!-- Основная информация о слушателе -->
+    <div class="card p-4 mb-4">
+        <div class="row">
+            <div class="col-md-3 text-center">
+                <img src="https://via.placeholder.com/150" class="rounded-circle border" alt="Фото">
+            </div>
+            <div class="col-md-9">
+                <h4>Иванов Иван Иванович</h4>
+                <p><strong>📧 Почта:</strong> ivanov@example.com</p>
+                <p><strong>📅 Дата рождения:</strong> 15.05.1990</p>
+                <p><strong>🔢 СНИЛС:</strong> 123-456-789 00</p>
+                <p><strong>🆔 Паспорт:</strong> AB1234567</p>
+                <p><strong>📞 Телефон:</strong> +7 (999) 123-45-67</p>
+                <p><strong>🎓 Статус обучения:</strong> Активный</p>
+                <p><strong>🏫 Форма обучения:</strong> Онлайн</p>
+                <button class="btn btn-edit mt-3 w-100">Изменить данные</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Группы слушателя -->
+    <h4 class="mb-3">Группы обучения</h4>
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        <!-- Группа 1 -->
+        <div class="col">
+            <div class="card p-3">
+                <h5 class="card-title">Frontend-разработка</h5>
+                <p><strong>📅 Даты:</strong> Январь 2023 - Июнь 2023</p>
+                <p><strong>👨‍🏫 Преподаватель:</strong> Петров П.П.</p>
+                <p><strong>📌 Статус:</strong> Завершено</p>
+            </div>
+        </div>
+
+        <!-- Группа 2 -->
+        <div class="col">
+            <div class="card p-3">
+                <h5 class="card-title">Backend-разработка</h5>
+                <p><strong>📅 Даты:</strong> Сентябрь 2023 - по настоящее время</p>
+                <p><strong>👨‍🏫 Преподаватель:</strong> Иванов И.И.</p>
+                <p><strong>📌 Статус:</strong> Обучается</p>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock content %}

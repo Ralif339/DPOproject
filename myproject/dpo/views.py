@@ -25,7 +25,8 @@ def groups_view(request):
 
 
 def statements_view(request):
-    return superuser_render(request, 'dpo/statements.html')
+    statements = Statements.objects.all()
+    return superuser_render(request, 'dpo/statements.html', context={"statements": statements})
 
 
 def commission_view(request):

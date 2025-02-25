@@ -5,8 +5,30 @@
 {% block content %}
 
     <div class="container">
-        <h2>Подача заявления</h2>
-
+        <h2 class="text-center">Выберите курс</h2>
+        <div class="col-md-9">
+            <div class="row row-cols-1 row-cols-md-3 g-4" id="coursesList">
+                {% for course in courses %}
+                <div class="col">
+                    <div class="card p-3">
+                        <div>
+                            <h5 class="card-title">{{ course.course_name }}</h5>
+                            <p><strong>Тип:</strong> {{ course.course_type}}</p>
+                            <p><strong>Стоимость:</strong> {{ course.price|floatformat:2|default:"0.00" }} руб.</p>
+                            <p><strong>Количество часов:</strong> {{ course.hours_count}} ч.</p>
+                        </div>
+                        <div class="mt-auto">
+                            <form action="{% url "new_statement" %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="course_id" value="{{ course.id }}">
+                                <button class="btn btn-primary w-100 mb-2">Выбрать</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 
 {% endblock content %}

@@ -55,3 +55,4 @@ class Statements(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Слушатель")
     statement_type = models.CharField(max_length=128, verbose_name="Тип заявления")
     submitting_date = models.DateField(verbose_name="Дата подачи")
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name="Выбранный курс", null=True)

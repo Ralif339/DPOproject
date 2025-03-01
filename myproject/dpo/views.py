@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from index.models import User
 from .models import *
 from .forms import *
+from django.utils import timezone
 
 
 def superuser_render(request, template: str, context=None):
@@ -21,12 +22,20 @@ def students_view(request):
 
 
 def groups_view(request):
-    return superuser_render(request, 'dpo/groups/groups.html')
+    groups = Group.objects.all()
+    return superuser_render(request, 'dpo/groups/groups.html', context={"groups": groups})
 
 
 def statements_view(request):
+    if request.method == "POST":
+        if request.POST.get("selected_group"):
+            print(request.POST.get("selected_group"))
     statements = Statements.objects.all()
-    return superuser_render(request, 'dpo/statements.html', context={"statements": statements})
+    groups = Group.objects.all()
+    today_date = timezone.now().date()
+    return superuser_render(request, 'dpo/statements.html', context={"statements": statements,
+                                                                     "groups": groups,
+                                                                     "today": today_date})
 
 
 def commission_view(request):

@@ -6,7 +6,14 @@
 {% block content %}
 <div class="container">
     <h2>Добавление группы</h2>
-    
+    {% if form.errors %}
+            <p>{{ form.errors.error }}</p>
+    {% endif %}
+    <form action="{% url "group_add" %}" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-success" type="submit">Добавить</button>
+    </form>
 </div>
 
 

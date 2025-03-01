@@ -20,19 +20,6 @@
 {% endblock style %}
 
 {% block content %}
-<div class="container">
-        <p>Имя: {{ user.name }}</p>
-        <p>Фамилия: {{ user.surname }}</p>
-        <p>Отчество: {{ user.patronymic }}</p>
-        <p>Дата рождения: {{ user.birthday }}</p>
-        <p>СНИЛС: {{ user.SNILS }}</p>
-        <p>Паспорт: {{ user.passport }}</p>
-        <p>Статус: {{ user.status }}</p>
-        <p>Телефон: {{ user.phone }}</p>
-
-        <a href="{% url "update_info" %}" class="btn btn-primary">Изменить</a>
-</div>
-
 <div class="container mt-4">
     <h2 class="text-center mb-4">Профиль слушателя</h2>
 
@@ -43,23 +30,21 @@
                 <img src="https://via.placeholder.com/150" class="rounded-circle border" alt="Фото">
             </div>
             <div class="col-md-9">
-                <h4>Иванов Иван Иванович</h4>
-                <p><strong>📧 Почта:</strong> ivanov@example.com</p>
-                <p><strong>📅 Дата рождения:</strong> 15.05.1990</p>
-                <p><strong>🔢 СНИЛС:</strong> 123-456-789 00</p>
-                <p><strong>🆔 Паспорт:</strong> AB1234567</p>
-                <p><strong>📞 Телефон:</strong> +7 (999) 123-45-67</p>
-                <p><strong>🎓 Статус обучения:</strong> Активный</p>
-                <p><strong>🏫 Форма обучения:</strong> Онлайн</p>
-                <button class="btn btn-edit mt-3 w-100">Изменить данные</button>
+                <h4>{{ user.surname }} {{ user.name }} {{ user.patronymic }}</h4>
+                <p><strong>📧 Почта:</strong> {{ user.email }}</p>
+                <p><strong>📅 Дата рождения:</strong> {{ user.birthday }}</p>
+                <p><strong>🔢 СНИЛС:</strong> {{ user.SNILS }}</p>
+                <p><strong>🆔 Паспорт:</strong> {{ user.passport }}</p>
+                <p><strong>📞 Телефон:</strong> {{ user.phone }}</p>
+                <p><strong>🎓 Статус обучения:</strong> {{ user.status }}</p>
+                <p><strong>🏫 Форма обучения:</strong> {{ user.ed_kind }}</p>
+                <a href="{% url "update_info" %}" class="btn btn-edit mt-3 w-100">Изменить данные</a>
             </div>
         </div>
     </div>
 
-    <!-- Группы слушателя -->
-    <h4 class="mb-3">Группы обучения</h4>
+    <h4 class="mb-3">Курсы</h4>
     <div class="row row-cols-1 row-cols-md-2 g-4">
-        <!-- Группа 1 -->
         <div class="col">
             <div class="card p-3">
                 <h5 class="card-title">Frontend-разработка</h5>
@@ -69,7 +54,6 @@
             </div>
         </div>
 
-        <!-- Группа 2 -->
         <div class="col">
             <div class="card p-3">
                 <h5 class="card-title">Backend-разработка</h5>
@@ -79,5 +63,7 @@
             </div>
         </div>
     </div>
+    <p></p>
+    <p></p>
 </div>
 {% endblock content %}

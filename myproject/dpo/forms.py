@@ -10,8 +10,19 @@ class GroupAddForm(forms.ModelForm):
     begin_date = forms.DateField(widget=DateInput())
     finish_date = forms.DateField(widget=DateInput())
     
-    COURSE_CHOICES = []
-    TEACHER_CHOICES = []
+    courses = Course.objects.all()
+    COURSE_CHOICES = {}
+    
+    for course in courses:
+        COURSE_CHOICES[course.course_name] = course.course_name
+    
+    teachers = Teacher.objects.all()
+    TEACHER_CHOICES = {}
+    
+    for teacher in teachers:
+        FIO = teacher.surname + teacher.name + teacher.patronymic
+        TEACHER_CHOICES[FIO] = FIO
+    
     
     class Meta:
         model = Group

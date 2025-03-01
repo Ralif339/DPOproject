@@ -8,7 +8,7 @@ from .models import User
 # Create your views here.
 def index_view(request):
     if request.user.is_superuser:
-        return render(request, 'index/manager.html')
+        return redirect('students')
     else:
         if request.user.is_authenticated:
             return render(request, 'index/student.html', context={})

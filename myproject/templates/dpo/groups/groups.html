@@ -3,13 +3,12 @@
 
 {% block style %}
     <style>
-        .btn-primary {
-            background-color:rgb(125, 125, 255);
-            border-color: rgb(125, 125, 255);
+        .btn-add {
+            background-color: #28a745;
+            color: white;
         }
-        .btn-primary:hover {
-            background-color: #7777DD;
-            border-color: #7777DD;
+        .btn-add:hover {
+            background-color: #218838;
         }
     </style>
 {% endblock style %}
@@ -48,7 +47,7 @@
             </select>
         </div>
         <div class="col-md-2 text-end">
-            <a class="btn btn-primary" href="{% url "group_add" %}">Добавить группу</a>
+            <a class="btn btn-add" href="{% url "group_add" %}">Добавить группу</a>
         </div>
     </div>
 
@@ -56,6 +55,7 @@
     <table class="table table-bordered text-center">
         <thead class="table-light">
             <tr>
+                <th>Название группы</th>
                 <th>Название курса</th>
                 <th>ФИО преподавателя</th>
                 <th>Срок обучения</th>
@@ -65,28 +65,20 @@
             </tr>
         </thead>
         <tbody id="groupTable">
-            <tr>
-                <td>Frontend-разработка</td>
-                <td>Иванов И.И.</td>
-                <td>3 месяца</td>
-                <td>15</td>
-                <td>Онлайн</td>
-                <td>
-                    <button class="btn btn-sm btn-warning" onclick="editGroup()">✏️</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteGroup()">🗑</button>
-                </td>
-            </tr>
-            <tr>
-                <td>Backend-разработка</td>
-                <td>Петров П.П.</td>
-                <td>6 месяцев</td>
-                <td>10</td>
-                <td>Офлайн</td>
-                <td>
-                    <button class="btn btn-sm btn-warning" onclick="editGroup()">✏️</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteGroup()">🗑</button>
-                </td>
-            </tr>
+            {% for group in groups %}
+                <tr>
+                    <td>{{ group.name }}</td>
+                    <td>{{ group.course.course_name }}</td>
+                    <td>{{ group.teacher.surname }} {{ group.teacher.name.0 }}. {{ group.teacher.patronymic.0 }}.</td>
+                    <td>{{ group.begin_date }} - {{ group.finish_date }}</td>
+                    <td>?</td>
+                    <td>{{ group.course.course_type }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" onclick="editGroup()">✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteGroup()">🗑</button>
+                    </td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>

@@ -2,10 +2,46 @@
 
 {% block title %}Подача заявления{% endblock title %}
 
+{% block style %}
+<style>
+    /* Скрываем стандартные радио-кнопки */
+    input[type="radio"] {
+        display: none;
+    }
+
+    /* Стилизация label как кнопки */
+    .toggle-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border: 2px solid #9999FF;
+        color: #9999FF;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    /* Подсвечиваем активную кнопку */
+    input[type="radio"]:checked + label {
+        background-color: #9999FF;
+        color: white;
+    }
+</style>
+{% endblock style %}
+
 {% block content %}
 
-    <div class="container">
-        <h2 class="text-center">Выберите курс</h2>
+    <div class="container text-center mt-5">
+        <h2 class="mb-4">Подача заявления</h2>
+
+        <!-- Радиокнопки -->
+        <input type="radio" id="enroll" name="action" checked>
+        <label for="enroll" class="toggle-btn">Зачисление</label>
+
+        <input type="radio" id="expel" name="action">
+        <label for="expel" class="toggle-btn">Отчисление</label>
+    </div>
+
+    <div class="container mt-5">
         <div class="col-md-9">
             <div class="row row-cols-1 row-cols-md-3 g-4" id="coursesList">
                 {% for course in courses %}
@@ -21,7 +57,7 @@
                             <form action="{% url "new_statement" %}" method="POST">
                                 {% csrf_token %}
                                 <input type="hidden" name="course_id" value="{{ course.id }}">
-                                <button class="btn btn-primary w-100 mb-2">Выбрать</button>
+                                <button style="background: #9999FF; border: #9999FF" class="btn btn-primary w-100 mb-2">Выбрать</button>
                             </form>
                         </div>
                     </div>
@@ -30,5 +66,7 @@
             </div>
         </div>
     </div>
+
+    
 
 {% endblock content %}

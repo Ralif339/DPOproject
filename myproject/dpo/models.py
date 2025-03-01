@@ -13,6 +13,10 @@ class Course(models.Model):
     class Meta: 
         verbose_name = 'Курс'
         verbose_name_plural = 'Курсы'
+        
+    def __str__(self):
+        return self.course_name
+        
     
     
 class CommissionMember(models.Model):
@@ -31,6 +35,9 @@ class Teacher(models.Model):
     name = models.CharField(max_length=255, verbose_name="Имя")
     patronymic = models.CharField(max_length=255, verbose_name="Отчество")
     position = models.CharField(max_length=255, verbose_name="Должность")
+    
+    def __str__(self):
+        return self.surname + " " + self.name + " "  + self.patronymic
     
 class Group(models.Model):
     name = models.CharField(max_length=255, verbose_name="Название группы")
@@ -55,4 +62,5 @@ class Statements(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Слушатель")
     statement_type = models.CharField(max_length=128, verbose_name="Тип заявления")
     submitting_date = models.DateField(verbose_name="Дата подачи")
+    status = models.CharField(max_length=128, verbose_name="Статус заявления", default="На рассмотрении")
     course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name="Выбранный курс", null=True)

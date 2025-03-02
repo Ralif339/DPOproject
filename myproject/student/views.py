@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from . import forms
-from dpo.models import Course, Statements
+from dpo.models import *
 from django.utils import timezone
 from django.http import JsonResponse
 
@@ -16,27 +16,60 @@ def update_info_view(request):
 
 def new_statement_view(request):
     if request.method == "POST":
-        course = Course.objects.get(id=request.POST.get('course_id'))
-        statement = Statements(student=request.user, 
-                               statement_type="зачисление", 
-                               submitting_date=timezone.now().date(),
-                               course=course)
-        statement.save()
+        course_id = request.POST.get('course_id')
+        group_id = request.POST.get('group_id')
+        if course_id:
+            course = Course.objects.get(id=course_id)
+            statement = Statements(
+                student=request.user,
+                statement_type="зачисление",
+                submitting_date=timezone.now().date(),
+                course=course
+            )
+            statement.save()
+        elif group_id:
+            group = Group.objects.get(id=group_id)
+            statement = Statements(
+                student=request.user,
+                statement_type="отчисление",
+                submitting_date=timezone.now().date(),
+                group=group
+            )
+            statement.save()
         return redirect('student_statements')
-    courses = Course.objects.all()
-    return render(request, 'student/new_statement.html', context={"courses": courses})
+
+    return render(request, 'student/new_statement.html')
 
 def get_courses(request):
     action = request.GET.get('action', 'enroll')
-    # Здесь можно добавить логику фильтрации курсов в зависимости от действия (зачисление/отчисление)
-    courses = Course.objects.all()
-    courses_data = [{
-        'id': course.id,
-        'course_name': course.course_name,
-        'course_type': course.course_type,
-        'price': str(course.price),
-        'hours_count': course.hours_count,
-    } for course in courses]
+    user = request.user
+
+    if action == 'enroll':
+        # Получаем курсы, у которых есть группы с датой окончания не позже сегодня
+        courses = Course.objects.filter(
+            group__finish_date__gte=timezone.now().date()
+        ).distinct()
+        courses_data = [{
+            'id': course.id,
+            'course_name': course.course_name,
+            'course_type': course.course_type,
+            'price': str(course.price),
+            'hours_count': course.hours_count,
+        } for course in courses]
+
+    elif action == 'expel':
+        # Получаем группы, в которых состоит текущий пользователь
+        groups = Group.objects.filter(
+            studentgroup__student=user
+        ).distinct()
+        courses_data = [{
+            'id': group.id,
+            'group_name': group.name,
+            'course_name': group.course.course_name,
+            'begin_date': group.begin_date.strftime('%Y-%m-%d'),
+            'finish_date': group.finish_date.strftime('%Y-%m-%d'),
+        } for group in groups]
+
     return JsonResponse({'courses': courses_data})
 
 def student_statements_view(request):

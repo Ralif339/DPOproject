@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from index.models import User
 from .models import *
 from .forms import *
@@ -27,12 +27,24 @@ def groups_view(request):
 
 
 def statements_view(request):
-    if request.method == "POST":
-        if request.POST.get("selected_group"):
-            print(request.POST.get("selected_group"))
-    statements = Statements.objects.all()
-    groups = Group.objects.all()
     today_date = timezone.now().date()
+    if request.method == "POST":
+        if request.POST.get("action_type") == "recall":
+            statement = Statements.objects.get(id=request.POST.get("statement_id"))
+            statement.status = "Отклонено"
+            statement.save()
+            return redirect("statements")
+        else:
+            if request.POST.get("selected_group"):
+                group = Group.objects.get(id=request.POST.get("selected_group"))
+                statement = Statements.objects.get(id=request.POST.get("statement_id"))
+                group.student.add(statement.student, through_defaults={"date": today_date})
+                statement.status = "Одобрено"
+                statement.save()
+            return redirect("statements")
+        
+    statements = Statements.objects.filter(status="На рассмотрении")
+    groups = Group.objects.all()
     return superuser_render(request, 'dpo/statements.html', context={"statements": statements,
                                                                      "groups": groups,
                                                                      "today": today_date})
@@ -53,8 +65,22 @@ def teachers_view(request):
 
 
 def courses_view(request):
+    if request.method == "POST":
+        course = Course.objects.get(id=request.POST.get("course_id"))
+        course.delete()
+        return redirect('courses')
     courses = Course.objects.all()
     return superuser_render(request, 'dpo/courses/courses.html', context={"courses": courses})
+
+def course_edit_view(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    if request.method == "POST":
+        form = CourseAddForm(request.POST, instance=course)
+        if form.is_valid():
+            form.save()
+        return redirect('courses')
+    form = CourseAddForm(instance=course)
+    return render(request, 'dpo/courses/course_edit.html', {"form": form, "course": course})
 
 
 def add_group_view(request):

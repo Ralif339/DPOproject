@@ -91,8 +91,13 @@
                             <p><strong>Количество часов:</strong> {{ course.hours_count}} ч.</p>
                         </div>
                         <div class="mt-auto">
-                            <button class="btn btn-edit w-100 mb-2">Редактировать</button>
-                            <button class="btn btn-delete w-100">Удалить</button>
+                            <a class="btn btn-edit w-100 mb-2" href="{% url "course_edit" course.id %}">Редактировать</a>
+                            <form action="{% url "courses" %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="course_id" value="{{course.id}}">
+                                <input type="hidden" name="action" value="delete">
+                                <button class="btn btn-delete w-100" type="submit">Удалить</button>
+                            </form> 
                         </div>
                     </div>
                 </div>

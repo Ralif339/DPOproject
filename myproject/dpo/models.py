@@ -64,3 +64,4 @@ class Statements(models.Model):
     submitting_date = models.DateField(verbose_name="Дата подачи")
     status = models.CharField(max_length=128, verbose_name="Статус заявления", default="На рассмотрении")
     course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name="Выбранный курс", null=True)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name="Группа", null=True)

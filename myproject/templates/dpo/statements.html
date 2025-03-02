@@ -96,18 +96,26 @@
                                             {% endwith %}
                                         {% endif %}
                                     {% endfor %}
-                                    {% if not found_suitable_group %}
-                                        <option value="">Нет подходящих групп</option>
-                                    {% endif %}
                                 {% endwith %}
                             </select>
+
+                            {% if found_suitable_group == False %}
+                            <p>Нет подходящих групп</p>
+                            {% endif %}
         
                             <!-- Кнопки -->
                             <div class="d-flex justify-content-between mt-3">
+                                <input type="hidden" name="statement_id" value="{{statement.id}}">
+                                <input type="hidden" name="action_type" value="submit">
                                 <button class="btn btn-accept w-50 me-2" type="submit">Зачислить</button>
                         </form>
 
-                            <button class="btn btn-reject w-50" onclick="rejectApplication()">Отклонить</button>
+                        <form action="{% url "statements" %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action_type" value="recall">
+                            <input type="hidden" name="statement_id" value="{{statement.id}}">
+                            <button class="btn btn-reject w-50" type="submit">Отклонить</button>
+                        </form>
                         </div>
                     </div>
                     {% endfor %}

@@ -1,0 +1,17 @@
+{% extends "manager_navigation.html" %}
+
+{% block title %}Редактирование курса{% endblock title %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="text-center">Редактирование курса</h2>
+    <form action="{% url "course_edit" course.id %}" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-success" type="submit">Подтвердить</button>
+
+    </form>
+</div>
+
+{% endblock content %}

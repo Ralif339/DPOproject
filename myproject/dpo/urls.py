@@ -10,6 +10,7 @@ urlpatterns = [
     path('orders/', orders_view, name="orders"),
     path('teachers/', teachers_view, name="teachers"),
     path('courses/', courses_view, name="courses"),
+    path('course_edit/<int:course_id>/', course_edit_view, name='course_edit'),
     path('group_add/', add_group_view, name="group_add"),
     path('course_add/', add_course_view, name="course_add"),
     path('teacher_add/', add_teacher_view, name="teacher_add"),

@@ -18,7 +18,15 @@ def superuser_render(request, template: str, context=None):
 # Create your views here.
 def students_view(request):
     students = User.objects.all().filter(is_superuser="False")
-    return superuser_render(request, "dpo/students.html", context={"students": students})
+    for student in students:
+        for groups in student.group_set.all():
+            print(student.name, groups.name)
+    return superuser_render(request, "dpo/students/students.html", context={"students": students})
+
+def student_profile_view(request, student_id):
+    student = User.objects.get(id=student_id)
+    context = {"student": student}
+    return render(request, 'dpo/students/student_profile.html', context)
 
 
 def groups_view(request):

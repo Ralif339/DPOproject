@@ -1,0 +1,74 @@
+{% extends "manager_navigation.html" %}
+{% load static %}
+
+{% block title %}Слушатель{% endblock title %}
+
+{% block style %}
+<style>
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .btn-edit {
+        background-color: #ffc107;
+        color: black;
+    }
+    .btn-edit:hover {
+        background-color: #e0a800;
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Профиль слушателя</h2>
+
+    <!-- Основная информация о слушателе -->
+    <div class="card p-4 mb-4">
+        <div class="row">
+            <div class="col-md-3 text-center">
+                <img src="{% static "img/logo.png" %}" width="200px" alt="Фото">
+            </div>
+            <div class="col-md-9">
+                <h4>{{ student.surname }} {{ student.name }} {{ student.patronymic }}</h4>
+                <div class="row">
+                    <div class="col">
+                        <p><strong>📧 Почта:</strong> {{ student.email }}</p>
+                        <p><strong>📅 Дата рождения:</strong> {{ student.birthday }}</p>
+                        <p><strong>🔢 СНИЛС:</strong> {{ student.SNILS }}</p>
+                        <p><strong>🆔 Паспорт:</strong> {{ student.passport }}</p>
+                        <p><strong>📞 Телефон:</strong> {{ student.phone }}</p>
+                    </div>
+                    <div class="col">
+                        <p><strong> Гражданство:</strong> {{ student.citizenship }}</p>
+                        <p><strong> Адрес:</strong> {{ student.address }}</p>
+                        <p><strong>🎓 Статус обучения:</strong> {{ student.status }}</p>
+                        <p><strong>🏫 Форма обучения:</strong> {{ student.ed_kind }}</p>
+                    </div>
+                </div>
+                
+                
+                <a href="" class="btn btn-edit mt-3 w-100">Изменить данные</a>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mb-3">Курсы</h4>
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        {% for group in student.group_set.all %}
+        <div class="col">
+            <div class="card p-3">
+                <h5 class="card-title">{{group.course.course_name}}</h5>
+                <p><strong> Группа:</strong> {{group.name}} </p>
+                <p><strong>📅 Даты:</strong> {{group.begin_date}} - {{group.finish_date}}</p>
+                <p><strong>👨‍🏫 Преподаватель:</strong> {{group.teacher.surname}} {{group.teacher.name.0}}. {{group.teacher.patronymic.0}}.</p>
+                <p><strong>📌 Статус:</strong> </p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <p></p>
+    <p></p>
+</div>
+{% endblock content %}

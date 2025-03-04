@@ -71,7 +71,7 @@
                     <td>{{ group.course.course_name }}</td>
                     <td>{{ group.teacher.surname }} {{ group.teacher.name.0 }}. {{ group.teacher.patronymic.0 }}.</td>
                     <td>{{ group.begin_date }} - {{ group.finish_date }}</td>
-                    <td>?</td>
+                    <td>{{ group.student.count }}</td>
                     <td>{{ group.course.course_type }}</td>
                     <td>
                         <button class="btn btn-sm btn-warning" onclick="editGroup()">✏️</button>

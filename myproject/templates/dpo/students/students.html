@@ -57,7 +57,13 @@
                                 <p><strong>СНИЛС:</strong> {{ student.SNILS }}</p>
                             </div>
                             <div class="col-md-auto d-flex flex-column">
-                                <p><strong>Группа:</strong> -</p>
+                                
+                                <p><strong>Группа:</strong>
+                                {% for group in student.group_set.all %}
+                                {{group.name}}  
+                                {% endfor %}
+                                </p>
+                                
                                 <p><strong>Телефон:</strong> {{ student.phone }}</p>
                                 <p><strong>Почта:</strong> {{ student.email }}</p>
                                 <p><strong>Паспорт:</strong> {{ student.passport }}</p>
@@ -67,8 +73,7 @@
 
                     <!-- Кнопки -->
                     <div class="col-md-auto d-flex flex-column gap-2">
-                        <a href="#" class="btn btn-warning text-dark">Изменить</a>
-                        <a href="#" class="btn btn-danger">Отчислить</a>
+                        <a href="{% url "student_profile" student.id %}" class="btn btn-warning text-dark">Перейти</a>
                     </div>
                 </div>
             {% endfor %}

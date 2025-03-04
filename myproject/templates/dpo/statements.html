@@ -90,7 +90,7 @@
                             <select name="selected_group" id="groups">
                                 {% with found_suitable_group=False %}
                                     {% for group in groups %}
-                                        {% if group.finish_date > today and group.course.id == statement.course.id %}
+                                        {% if group.finish_date|date:"Y-m-d" > today|date:"Y-m-d" and group.course.id == statement.course.id %}
                                             <option value="{{ group.id }}">{{ group.name }}</option>
                                             {% with found_suitable_group=True %}
                                             {% endwith %}
@@ -98,10 +98,14 @@
                                     {% endfor %}
                                 {% endwith %}
                             </select>
-
                             {% if found_suitable_group == False %}
                             <p>Нет подходящих групп</p>
                             {% endif %}
+
+                            <select name="ed_kind" id="ed_kind">
+                                <option value="Бюджет">Бюджет</option>
+                                <option value="Внебюджет">Внебюджет</option>
+                            </select>
         
                             <!-- Кнопки -->
                             <div class="d-flex justify-content-between mt-3">

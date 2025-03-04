@@ -41,41 +41,42 @@
         <!-- Карточки слушателей -->
         <div class="col-10">
             {% for student in students %}
-                <div class="row align-items-center border p-3 mb-3 rounded shadow-sm">
-                    <!-- Фото -->
-                    <div class="col-md-auto">
-                        <img src="{% static 'img/logo.png' %}" width="120px" height="120px" class="rounded-circle border" alt="">
-                    </div>
+                {% if student.name %}
+                    <div class="row align-items-center border p-3 mb-3 rounded shadow-sm">
+                        <!-- Фото -->
+                        <div class="col-md-auto">
+                            <img src="{% static 'img/logo.png' %}" width="120px" height="120px" class="rounded-circle border" alt="">
+                        </div>
 
-                    <!-- Данные студента -->
-                    <div class="col">
-                        <div class="row pt-2">
-                            <div class="col-md-auto d-flex flex-column">
-                                <p><strong>ФИО:</strong> {{ student.surname }} {{ student.name }} {{ student.patronymic }}</p>
-                                <p><strong>Статус:</strong> {{ student.status }}</p>
-                                <p><strong>Дата рождения:</strong> {{ student.birthday }}</p>
-                                <p><strong>СНИЛС:</strong> {{ student.SNILS }}</p>
-                            </div>
-                            <div class="col-md-auto d-flex flex-column">
-                                
-                                <p><strong>Группа:</strong>
-                                {% for group in student.group_set.all %}
-                                {{group.name}}  
-                                {% endfor %}
-                                </p>
-                                
-                                <p><strong>Телефон:</strong> {{ student.phone }}</p>
-                                <p><strong>Почта:</strong> {{ student.email }}</p>
-                                <p><strong>Паспорт:</strong> {{ student.passport }}</p>
+                        <!-- Данные студента -->
+                        <div class="col">
+                            <div class="row pt-2">
+                                <div class="col-md-auto d-flex flex-column">
+                                    <p><strong>ФИО:</strong> {{ student.surname }} {{ student.name }} {{ student.patronymic }}</p>
+                                    <p><strong>Дата рождения:</strong> {{ student.birthday }}</p>
+                                    <p><strong>СНИЛС:</strong> {{ student.SNILS }}</p>
+                                    <p><strong>Паспорт:</strong> {{ student.passport }}</p>
+                                </div>
+                                <div class="col-md-auto d-flex flex-column">
+                                    
+                                    <p><strong>Группа:</strong>
+                                    {% for group in student.group_set.all %}
+                                    {{group.name}}  
+                                    {% endfor %}
+                                    </p>
+                                    
+                                    <p><strong>Телефон:</strong> {{ student.phone }}</p>
+                                    <p><strong>Почта:</strong> {{ student.email }}</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Кнопки -->
-                    <div class="col-md-auto d-flex flex-column gap-2">
-                        <a href="{% url "student_profile" student.id %}" class="btn btn-warning text-dark">Перейти</a>
+                        <!-- Кнопки -->
+                        <div class="col-md-auto d-flex flex-column gap-2">
+                            <a href="{% url "student_profile" student.id %}" class="btn btn-warning text-dark">Перейти</a>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             {% endfor %}
         </div>
     </div>

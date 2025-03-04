@@ -1,4 +1,5 @@
 {% extends "student_navigation.html" %}
+{% load static %}
 
 {% block title %}Домашняя страница{% endblock title %}
 
@@ -27,17 +28,23 @@
     <div class="card p-4 mb-4">
         <div class="row">
             <div class="col-md-3 text-center">
-                <img src="https://via.placeholder.com/150" class="rounded-circle border" alt="Фото">
+                <img src="{% static "img/logo.png" %}" width="200px" class="rounded-circle border" alt="Фото">
             </div>
             <div class="col-md-9">
-                <h4>{{ user.surname }} {{ user.name }} {{ user.patronymic }}</h4>
-                <p><strong>📧 Почта:</strong> {{ user.email }}</p>
-                <p><strong>📅 Дата рождения:</strong> {{ user.birthday }}</p>
-                <p><strong>🔢 СНИЛС:</strong> {{ user.SNILS }}</p>
-                <p><strong>🆔 Паспорт:</strong> {{ user.passport }}</p>
-                <p><strong>📞 Телефон:</strong> {{ user.phone }}</p>
-                <p><strong>🎓 Статус обучения:</strong> {{ user.status }}</p>
-                <p><strong>🏫 Форма обучения:</strong> {{ user.ed_kind }}</p>
+                <div class="row">
+                    <h4>{{ user.surname }} {{ user.name }} {{ user.patronymic }}</h4>
+                    <div class="col">
+                        <p><strong>📧 Почта:</strong> {{ user.email }}</p>
+                        <p><strong>📅 Дата рождения:</strong> {{ user.birthday }}</p>
+                        <p><strong>🔢 СНИЛС:</strong> {{ user.SNILS }}</p>
+                        <p><strong>🆔 Паспорт:</strong> {{ user.passport }}</p>
+                    </div>
+                    <div class="col">
+                        <p><strong>📞 Телефон:</strong> {{ user.phone }}</p>
+                        <p><strong>Гражданство:</strong> {{ user.citizenship }}</p>
+                        <p><strong>Адрес проживания:</strong> {{ user.address }}</p>
+                    </div>
+                </div>
                 <a href="{% url "update_info" %}" class="btn btn-edit mt-3 w-100">Изменить данные</a>
             </div>
         </div>
@@ -45,23 +52,22 @@
 
     <h4 class="mb-3">Курсы</h4>
     <div class="row row-cols-1 row-cols-md-2 g-4">
+        {% for group in user.group_set.all %}
         <div class="col">
             <div class="card p-3">
-                <h5 class="card-title">Frontend-разработка</h5>
-                <p><strong>📅 Даты:</strong> Январь 2023 - Июнь 2023</p>
-                <p><strong>👨‍🏫 Преподаватель:</strong> Петров П.П.</p>
-                <p><strong>📌 Статус:</strong> Завершено</p>
+                <h5 class="card-title">{{group.course.course_name}}</h5>
+                <p><strong> Группа:</strong> {{group.name}} </p>
+                <p><strong>📅 Срок обучения:</strong> {{group.begin_date}} - {{group.finish_date}}</p>
+                <p><strong>👨‍🏫 Преподаватель:</strong> {{group.teacher.surname}} {{group.teacher.name.0}}. {{group.teacher.patronymic.0}}.</p>
+                <p><strong>📌 Статус:</strong> 
+                    {% if group.finish_date|date:"Y-m-d" > today|date:"Y-m-d" %}
+                    Активно
+                    {% else %}
+                    Неактивно
+                    {% endif %} </p>
             </div>
         </div>
-
-        <div class="col">
-            <div class="card p-3">
-                <h5 class="card-title">Backend-разработка</h5>
-                <p><strong>📅 Даты:</strong> Сентябрь 2023 - по настоящее время</p>
-                <p><strong>👨‍🏫 Преподаватель:</strong> Иванов И.И.</p>
-                <p><strong>📌 Статус:</strong> Обучается</p>
-            </div>
-        </div>
+        {% endfor %}
     </div>
     <p></p>
     <p></p>

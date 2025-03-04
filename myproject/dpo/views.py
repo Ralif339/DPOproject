@@ -25,7 +25,12 @@ def students_view(request):
 
 def student_profile_view(request, student_id):
     student = User.objects.get(id=student_id)
-    context = {"student": student}
+    student_groups = StudentGroup.objects.filter(student=student).select_related('group')
+    context = {
+        "student": student,
+        "student_groups": student_groups,  
+        "today": timezone.now().date()
+    }
     return render(request, 'dpo/students/student_profile.html', context)
 
 
@@ -46,8 +51,10 @@ def statements_view(request):
             if request.POST.get("selected_group"):
                 group = Group.objects.get(id=request.POST.get("selected_group"))
                 statement = Statements.objects.get(id=request.POST.get("statement_id"))
-                group.student.add(statement.student, through_defaults={"date": today_date})
+                ed_kind = request.POST.get("ed_kind")
+                group.student.add(statement.student, through_defaults={"date": today_date, "ed_kind": ed_kind})
                 statement.status = "Одобрено"
+                statement.group = group
                 statement.save()
             return redirect("statements")
         

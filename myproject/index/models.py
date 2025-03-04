@@ -37,8 +37,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=255, blank=True, default='Не указано')
     address = models.CharField(max_length=255, blank=True, default='Не указано')
     citizenship = models.CharField(max_length=255, blank=True, default='Не указано')
-    status = models.CharField(max_length=255, blank=True, default='Не зачислен')
-    ed_kind = models.CharField(max_length=255, blank=True, default='Нет')
         
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)

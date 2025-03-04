@@ -11,5 +11,5 @@ class StudentInfoForm(forms.ModelForm):
         model = User
         fields = ["name", "surname", "patronymic", 
                   "birthday", "SNILS", "passport",
-                  "phone"]
+                  "phone", "citizenship", "address"]
         

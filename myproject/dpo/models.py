@@ -52,6 +52,7 @@ class StudentGroup(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Слушатель")
     group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name="Группа")
     date = models.DateField(verbose_name="Дата зачисления")
+    ed_kind = models.CharField(max_length=50, verbose_name="Форма обучения", null=True)
     
 class GroupCommission(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name="Группа")

@@ -38,13 +38,11 @@
                         <p><strong>📅 Дата рождения:</strong> {{ student.birthday }}</p>
                         <p><strong>🔢 СНИЛС:</strong> {{ student.SNILS }}</p>
                         <p><strong>🆔 Паспорт:</strong> {{ student.passport }}</p>
-                        <p><strong>📞 Телефон:</strong> {{ student.phone }}</p>
                     </div>
                     <div class="col">
+                        <p><strong>📞 Телефон:</strong> {{ student.phone }}</p>
                         <p><strong> Гражданство:</strong> {{ student.citizenship }}</p>
                         <p><strong> Адрес:</strong> {{ student.address }}</p>
-                        <p><strong>🎓 Статус обучения:</strong> {{ student.status }}</p>
-                        <p><strong>🏫 Форма обучения:</strong> {{ student.ed_kind }}</p>
                     </div>
                 </div>
                 
@@ -56,17 +54,29 @@
 
     <h4 class="mb-3">Курсы</h4>
     <div class="row row-cols-1 row-cols-md-2 g-4">
-        {% for group in student.group_set.all %}
-        <div class="col">
-            <div class="card p-3">
-                <h5 class="card-title">{{group.course.course_name}}</h5>
-                <p><strong> Группа:</strong> {{group.name}} </p>
-                <p><strong>📅 Даты:</strong> {{group.begin_date}} - {{group.finish_date}}</p>
-                <p><strong>👨‍🏫 Преподаватель:</strong> {{group.teacher.surname}} {{group.teacher.name.0}}. {{group.teacher.patronymic.0}}.</p>
-                <p><strong>📌 Статус:</strong> </p>
-            </div>
+        {% for student_group in student_groups %}
+    <div class="col">
+        <div class="card p-3">
+            <h5 class="card-title">{{ student_group.group.course.course_name }}</h5>
+            <p><strong> Группа:</strong> {{ student_group.group.name }} </p>
+            <p><strong> Форма обучения:</strong> {{ student_group.ed_kind }} </p>
+            <p><strong>📅 Дата зачисления:</strong> {{ student_group.date }} </p>
+            <p><strong>📅 Срок:</strong> {{ student_group.group.begin_date }} - {{ student_group.group.finish_date }}</p>
+            <p><strong>👨‍🏫 Преподаватель:</strong> 
+                {{ student_group.group.teacher.surname }} 
+                {{ student_group.group.teacher.name.0 }}. 
+                {{ student_group.group.teacher.patronymic.0 }}.
+            </p>
+            <p><strong>📌 Статус:</strong> 
+                {% if student_group.group.finish_date|date:"Y-m-d" > today|date:"Y-m-d" %}
+                    Активно
+                {% else %}
+                    Неактивно
+                {% endif %} 
+            </p>
         </div>
-        {% endfor %}
+    </div>
+{% endfor %}
     </div>
     <p></p>
     <p></p>

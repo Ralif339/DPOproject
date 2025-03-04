@@ -66,17 +66,19 @@ def get_courses(request):
             'id': group.id,
             'group_name': group.name,
             'course_name': group.course.course_name,
-            'begin_date': group.begin_date.strftime('%Y-%m-%d'),
-            'finish_date': group.finish_date.strftime('%Y-%m-%d'),
+            'begin_date': group.begin_date,
+            'finish_date': group.finish_date,
         } for group in groups]
 
     return JsonResponse({'courses': courses_data})
 
 def student_statements_view(request):
     if request.method == "POST":
-        statement_to_del = Statements.objects.filter(id=request.POST.get("statement_id"))
+        statement_to_del = Statements.objects.get(id=request.POST.get("statement_id"))
         statement_to_del.delete()
+        return redirect('student_statements')
         
     statements = Statements.objects.filter(student_id=request.user.id)
-    return render(request, 'student/student_statements.html', context={"statements": statements})
+    return render(request, 'student/student_statements.html', context={"statements": statements,
+                                                                       "today": timezone.now().date(),})
     

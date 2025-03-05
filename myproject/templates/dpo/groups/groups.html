@@ -74,7 +74,7 @@
                     <td>{{ group.student.count }}</td>
                     <td>{{ group.course.course_type }}</td>
                     <td>
-                        <button class="btn btn-sm btn-warning" onclick="editGroup()">✏️</button>
+                        <a class="btn btn-sm btn-warning" href="{% url "group_detail" group.id %}">⚙</a>
                         <button class="btn btn-sm btn-danger" onclick="deleteGroup()">🗑</button>
                     </td>
                 </tr>

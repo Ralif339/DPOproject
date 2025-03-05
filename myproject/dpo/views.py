@@ -38,6 +38,11 @@ def groups_view(request):
     groups = Group.objects.all()
     return superuser_render(request, 'dpo/groups/groups.html', context={"groups": groups})
 
+def group_detail_view(request, group_id):
+    group = Group.objects.get(id=group_id)
+    context ={"group": group}
+    return render(request, 'dpo/groups/group_detail.html', context)
+
 
 def statements_view(request):
     today_date = timezone.now().date()

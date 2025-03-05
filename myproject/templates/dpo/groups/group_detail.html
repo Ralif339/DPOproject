@@ -1,0 +1,64 @@
+{% extends "manager_navigation.html" %}
+
+{% block title %}Группа{% endblock title %}
+
+{% block style %}
+
+{% endblock style %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header text-white" style="background: #9999FF">
+            <h3 class="mb-0">Группа: Frontend Разработчики</h3>
+        </div>
+        <div class="card-body">
+            <p><strong>Курс:</strong> Веб-разработка с Bootstrap 5</p>
+            <p><strong>Дата начала:</strong> 10 января 2024</p>
+            <p><strong>Дата окончания:</strong> 10 апреля 2024</p>
+            <p><strong>Преподаватель:</strong> Иван Петров</p>
+            <p><strong>Количество слушателей:</strong> <span id="total-students">5</span></p>
+            
+            <h4 class="mt-4">Список слушателей</h4>
+            <table class="table table-bordered mt-2">
+                <thead class="table-dark">
+                    <tr>
+                        <th>№</th>
+                        <th>Имя</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody id="students-list">
+                    <tr>
+                        <td>1</td>
+                        <td>Алексей Смирнов</td>
+                        <td><button class="btn btn-danger btn-sm remove-student">Отчислить</button></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Марина Иванова</td>
+                        <td><button class="btn btn-danger btn-sm remove-student">Отчислить</button></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Дмитрий Кузнецов</td>
+                        <td><button class="btn btn-danger btn-sm remove-student">Отчислить</button></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Екатерина Белова</td>
+                        <td><button class="btn btn-danger btn-sm remove-student">Отчислить</button></td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Сергей Орлов</td>
+                        <td><button class="btn btn-danger btn-sm remove-student">Отчислить</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <button id="remove-all" class="btn btn-warning mt-3">Отчислить всех (завершение курса)</button>
+        </div>
+    </div>
+</div>
+{% endblock content %}

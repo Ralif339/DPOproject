@@ -59,7 +59,7 @@
                 <th>Название курса</th>
                 <th>ФИО преподавателя</th>
                 <th>Срок обучения</th>
-                <th>Кол-во человек</th>
+                <th>Кол-во слушателей</th>
                 <th>Тип курса</th>
                 <th>Действия</th>
             </tr>
@@ -71,7 +71,7 @@
                     <td>{{ group.course.course_name }}</td>
                     <td>{{ group.teacher.surname }} {{ group.teacher.name.0 }}. {{ group.teacher.patronymic.0 }}.</td>
                     <td>{{ group.begin_date }} - {{ group.finish_date }}</td>
-                    <td>{{ group.student.count }}</td>
+                    <td>{{ group.student_count }}</td>
                     <td>{{ group.course.course_type }}</td>
                     <td>
                         <a class="btn btn-sm btn-warning" href="{% url "group_detail" group.id %}">⚙</a>

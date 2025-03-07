@@ -10,55 +10,126 @@
 <div class="container mt-5">
     <div class="card shadow">
         <div class="card-header text-white" style="background: #9999FF">
-            <h3 class="mb-0">Группа: Frontend Разработчики</h3>
+            <h3 class="mb-0 text-center">Группа: {{group.name}}</h3>
         </div>
         <div class="card-body">
-            <p><strong>Курс:</strong> Веб-разработка с Bootstrap 5</p>
-            <p><strong>Дата начала:</strong> 10 января 2024</p>
-            <p><strong>Дата окончания:</strong> 10 апреля 2024</p>
-            <p><strong>Преподаватель:</strong> Иван Петров</p>
-            <p><strong>Количество слушателей:</strong> <span id="total-students">5</span></p>
+            <p><strong>Курс:</strong> {{group.course.course_name}}</p>
+            <p><strong>Дата начала:</strong> {{group.begin_date}}</p>
+            <p><strong>Дата окончания:</strong> {{group.finish_date}}</p>
+            <p><strong>Преподаватель:</strong> {{group.teacher.surname}} {{group.teacher.name}} {{group.teacher.patronymic}}</p>
+            <p><strong>Количество слушателей:</strong> <span id="total-students">{{student_count}}</span></p>
             
             <h4 class="mt-4">Список слушателей</h4>
             <table class="table table-bordered mt-2">
                 <thead class="table-dark">
-                    <tr>
+                    <tr class="text-center">
                         <th>№</th>
                         <th>Имя</th>
+                        <th>Форма обучения</th>
                         <th>Действие</th>
                     </tr>
                 </thead>
                 <tbody id="students-list">
-                    <tr>
-                        <td>1</td>
-                        <td>Алексей Смирнов</td>
-                        <td><button class="btn btn-danger btn-sm remove-student">Отчислить</button></td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Марина Иванова</td>
-                        <td><button class="btn btn-danger btn-sm remove-student">Отчислить</button></td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Дмитрий Кузнецов</td>
-                        <td><button class="btn btn-danger btn-sm remove-student">Отчислить</button></td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>Екатерина Белова</td>
-                        <td><button class="btn btn-danger btn-sm remove-student">Отчислить</button></td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>Сергей Орлов</td>
-                        <td><button class="btn btn-danger btn-sm remove-student">Отчислить</button></td>
-                    </tr>
+                    {% for student_group in student_groups %}
+                        <tr class="text-center">
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ student_group.student.surname }} {{ student_group.student.name }} {{ student_group.student.patronymic }}</td>
+                            <td>{{ student_group.ed_kind|default:"-" }}</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm remove-student" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#removeModal"
+                                    data-student-id="{{student_group.student.id}}"
+                                    data-student-name="{{ student_group.student.surname }} {{ student_group.student.name }}">
+                                    Отчислить
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
             
-            <button id="remove-all" class="btn btn-warning mt-3">Отчислить всех (завершение курса)</button>
+            <form id="finish-course-form" method="POST" action="{% url 'finish_course' group.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="student_ids" id="student-ids">
+                <!-- Кнопка завершения курса -->
+                <button type="submit" id="remove-all" class="btn btn-warning mt-3">Завершить курс</button>
+            </form>
+            
+            
+
+            <!-- 🔹 Модальное окно для указания причины отчисления -->
+            <div class="modal fade" id="removeModal" tabindex="-1" aria-labelledby="removeModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="removeModalLabel">Отчисление студента</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                        </div>
+                        <form method="POST" action="{% url 'group_detail' group.id %}">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                <p><strong>Вы действительно хотите отчислить студента?</strong></p>
+                                <p id="student-name"></p>
+
+                                <input type="hidden" name="student_id" id="student-id">
+                                
+                                <div class="mb-3">
+                                    <label for="reason" class="form-label">Причина отчисления</label>
+                                    <textarea class="form-control" name="reason" id="reason" rows="3" required></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                <button type="submit" class="btn btn-danger">Отчислить</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let removeModal = document.getElementById("removeModal");
+
+        removeModal.addEventListener("show.bs.modal", function (event) {
+            let button = event.relatedTarget;
+            let studentId = button.getAttribute("data-student-id");
+            let studentName = button.getAttribute("data-student-name");
+
+            if (studentId) {
+                document.getElementById("student-id").value = studentId;
+                document.getElementById("student-name").textContent = "Студент: " + studentName;
+            } else {
+                console.error("Ошибка: studentId не найден");
+            }
+        });
+    });
+    // Обработчик нажатия на "Завершить курс"
+    document.getElementById("remove-all").addEventListener("click", function () {
+        let studentIds = [];
+        let studentRows = document.querySelectorAll("#students-list tr");
+
+        studentRows.forEach(row => {
+            let studentId = row.querySelector(".remove-student").getAttribute("data-student-id");
+            if (studentId) {
+                studentIds.push(studentId);
+            }
+        });
+
+        if (studentIds.length === 0) {
+            alert("Нет студентов для отчисления.");
+            return;
+        }
+
+        // Записываем ID в скрытое поле формы
+        document.getElementById("student-ids").value = JSON.stringify(studentIds);
+
+        // Отправляем форму
+        document.getElementById("finish-course-form").submit();
+    });
+</script>
 {% endblock content %}

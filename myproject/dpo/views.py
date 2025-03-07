@@ -3,6 +3,8 @@ from index.models import User
 from .models import *
 from .forms import *
 from django.utils import timezone
+from django.contrib import messages
+from django.db.models import Count, OuterRef, Subquery
 
 
 def superuser_render(request, template: str, context=None):
@@ -35,13 +37,63 @@ def student_profile_view(request, student_id):
 
 
 def groups_view(request):
-    groups = Group.objects.all()
+    # Подзапрос для подсчета отчисленных студентов в группе
+    expelled_students = StudentExpulsion.objects.filter(
+        group=OuterRef("id")
+    ).values("group").annotate(count=Count("student")).values("count")
+
+    # Получаем группы с количеством слушателей без отчисленных
+    groups = Group.objects.annotate(
+        student_count=Count("studentgroup") - Subquery(expelled_students, output_field=models.IntegerField())
+    )
+
     return superuser_render(request, 'dpo/groups/groups.html', context={"groups": groups})
 
 def group_detail_view(request, group_id):
     group = Group.objects.get(id=group_id)
-    context ={"group": group}
+    if request.method == "POST":
+        student = User.objects.get(id=request.POST.get("student_id"))
+        reason = request.POST.get("reason")
+        student_expulsion = StudentExpulsion.objects.create(student=student,
+                                                            reason=reason,
+                                                            date=timezone.now().date(),
+                                                            group=group)
+        student_expulsion.save()
+    
+    expelled_students = StudentExpulsion.objects.filter(group=group).values_list("student_id", flat=True)
+    student_groups = StudentGroup.objects.filter(group=group).exclude(student_id__in=expelled_students).select_related("student").order_by("student__surname")
+    student_count = student_groups.count()
+    context ={"group": group, "student_groups": student_groups, "student_count": student_count}
     return render(request, 'dpo/groups/group_detail.html', context)
+
+def finish_course(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+
+    if request.method == "POST":
+        student_ids = request.POST.get("student_ids")
+
+        if not student_ids:
+            messages.error(request, "Ошибка: Не переданы ID студентов.")
+            return redirect("group_detail", group_id=group.id)
+
+        student_ids = eval(student_ids)  # Преобразуем строку JSON в список
+
+        for student_id in student_ids:
+            student = get_object_or_404(User, id=student_id)
+            
+            # Проверяем, не отчислен ли уже студент
+            if not StudentExpulsion.objects.filter(student=student, group=group).exists():
+                StudentExpulsion.objects.create(
+                    student=student,
+                    reason="Завершение курса",
+                    date=timezone.now().date(),
+                    group=group
+                )
+
+        messages.success(request, "Все студенты отчислены по причине завершения курса.")
+        return redirect("group_detail", group_id=group.id)
+
+    return redirect("group_detail", group_id=group.id)
 
 
 def statements_view(request):
@@ -71,6 +123,12 @@ def statements_view(request):
 
 
 def commission_view(request):
+    if request.method == "POST":
+        member_id = request.POST.get('member_id')
+        if member_id:
+            member = CommissionMember.objects.get(id=member_id)
+            member.delete()
+            return redirect('commission')
     commission = CommissionMember.objects.all()
     return superuser_render(request, 'dpo/commission/commission.html', context={"commission": commission})
 
@@ -80,8 +138,25 @@ def orders_view(request):
 
 
 def teachers_view(request):
+    if request.method == "POST":
+        teacher_id = request.POST.get('teacher_id')
+        if teacher_id:
+            teacher = Teacher.objects.get(id=teacher_id)
+            teacher.delete()
+            return redirect('teachers')
     teachers = Teacher.objects.all()
     return superuser_render(request, 'dpo/teachers/teachers.html', context={"teachers": teachers})
+
+def teacher_edit_view(request, teacher_id):
+    teacher = get_object_or_404(Teacher, id=teacher_id)
+    if request.method == "POST":
+        form = TeacherAddForm(request.POST, instance=teacher)
+        if form.is_valid():
+            form.save()
+        return redirect('teachers')
+    form = TeacherAddForm(instance=teacher)
+    context = {"form": form, "teacher": teacher}
+    return render(request, 'dpo/teachers/teacher_edit.html', context)
 
 
 def courses_view(request):
@@ -145,3 +220,14 @@ def add_commission_view(request):
     else:
         form = CommissionAddForm()
     return superuser_render(request, 'dpo/commission/commission_add.html', context={'form': form,})
+
+def commission_edit_view(request, member_id):
+    commission = get_object_or_404(CommissionMember, id=member_id)
+    if request.method == "POST":
+        form = CommissionAddForm(request.POST, instance=commission)
+        if form.is_valid():
+            form.save()
+        return redirect('commission')
+    form = CommissionAddForm(instance=commission)
+    context = {"form": form, "commission": commission}
+    return render(request, 'dpo/commission/commission_edit.html', context)

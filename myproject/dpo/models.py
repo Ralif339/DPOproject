@@ -25,10 +25,7 @@ class CommissionMember(models.Model):
     patronymic = models.CharField(max_length=255, verbose_name="Отчество")
     position = models.CharField(max_length=255, verbose_name="Должность")
     
-class StudentExpulsion(models.Model):
-    student = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Слушатель")
-    reason = models.CharField(max_length=255, verbose_name="Причина")
-    date = models.DateField(verbose_name="Дата")
+
     
 class Teacher(models.Model):
     surname = models.CharField(max_length=255, verbose_name="Фамилия")
@@ -47,6 +44,12 @@ class Group(models.Model):
     finish_date = models.DateField(verbose_name="Дата окончания")
     student = models.ManyToManyField(User, through="StudentGroup")
     commission = models.ManyToManyField(CommissionMember, through="GroupCommission")
+    
+class StudentExpulsion(models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Слушатель")
+    reason = models.CharField(max_length=255, verbose_name="Причина")
+    date = models.DateField(verbose_name="Дата")
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name="Слушатель", null=True)
     
 class StudentGroup(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Слушатель")

@@ -65,8 +65,12 @@
                 <h5 class="card-title">{{ teacher.surname }} {{ teacher.name }} {{ teacher.patronymic }}</h5>
                 <p class="card-text">{{ teacher.position }}</p>
                 <div class="mt-auto">
-                    <button class="btn btn-edit w-100 mb-2">Редактировать</button>
-                    <button class="btn btn-delete w-100">Удалить</button>
+                    <a class="btn btn-edit w-100 mb-2" href="{% url "teacher_edit" teacher.id %}">Редактировать</a>
+                    <form action="{% url "teachers" %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" value={{teacher.id}} name='teacher_id'>
+                        <button type="submit" class="btn btn-delete w-100">Удалить</button>
+                    </form>
                 </div>
             </div>
         </div>

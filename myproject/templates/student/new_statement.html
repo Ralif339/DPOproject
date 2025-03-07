@@ -25,6 +25,15 @@
         background-color: #9999FF;
         color: white;
     }
+
+    /* Стили для сообщений */
+    .no-courses-message {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 18px;
+        color: #666;
+        width: 100%;
+    }
 </style>
 {% endblock style %}
 
@@ -64,6 +73,13 @@
             </div>
             {% endfor %}
         </div>
+        <!-- Сообщение, если нет курсов -->
+        <div id="noCoursesMessage" class="no-courses-message" style="display: none;">
+            Нет доступных курсов для зачисления
+        </div>
+        <div id="noGroupsMessage" class="no-courses-message" style="display: none;">
+            Вы не обучаетесь ни на одном курсе
+        </div>
     </div>
 </div>
 
@@ -72,58 +88,71 @@
         const enrollRadio = document.getElementById('enroll');
         const expelRadio = document.getElementById('expel');
         const coursesList = document.getElementById('coursesList');
+        const noCoursesMessage = document.getElementById('noCoursesMessage');
+        const noGroupsMessage = document.getElementById('noGroupsMessage');
 
         function updateCoursesList(action) {
             fetch(`/student/get_courses/?action=${action}`)
                 .then(response => response.json())
                 .then(data => {
                     coursesList.innerHTML = '';
+                    noCoursesMessage.style.display = 'none';
+                    noGroupsMessage.style.display = 'none';
+
                     if (action === 'enroll') {
-                        data.courses.forEach(course => {
-                            const courseCard = `
-                                <div class="col">
-                                    <div class="card p-3">
-                                        <div>
-                                            <h5 class="card-title">${course.course_name}</h5>
-                                            <p><strong>Тип:</strong> ${course.course_type}</p>
-                                            <p><strong>Стоимость:</strong> ${course.price} руб.</p>
-                                            <p><strong>Количество часов:</strong> ${course.hours_count} ч.</p>
-                                        </div>
-                                        <div class="mt-auto">
-                                            <form action="{% url "new_statement" %}" method="POST">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="course_id" value="${course.id}">
-                                                <button style="background: #9999FF; border: #9999FF" class="btn btn-primary w-100 mb-2">Выбрать</button>
-                                            </form>
+                        if (data.courses.length === 0) {
+                            noCoursesMessage.style.display = 'block';
+                        } else {
+                            data.courses.forEach(course => {
+                                const courseCard = `
+                                    <div class="col">
+                                        <div class="card p-3">
+                                            <div>
+                                                <h5 class="card-title">${course.course_name}</h5>
+                                                <p><strong>Тип:</strong> ${course.course_type}</p>
+                                                <p><strong>Стоимость:</strong> ${course.price} руб.</p>
+                                                <p><strong>Количество часов:</strong> ${course.hours_count} ч.</p>
+                                            </div>
+                                            <div class="mt-auto">
+                                                <form action="{% url "new_statement" %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="course_id" value="${course.id}">
+                                                    <button style="background: #9999FF; border: #9999FF" class="btn btn-primary w-100 mb-2">Выбрать</button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            `;
-                            coursesList.insertAdjacentHTML('beforeend', courseCard);
-                        });
+                                `;
+                                coursesList.insertAdjacentHTML('beforeend', courseCard);
+                            });
+                        }
                     } else if (action === 'expel') {
-                        data.courses.forEach(group => {
-                            const groupCard = `
-                                <div class="col">
-                                    <div class="card p-3">
-                                        <div>
-                                            <h5 class="card-title">${group.group_name}</h5>
-                                            <p><strong>Курс:</strong> ${group.course_name}</p>
-                                            <p><strong>Дата начала:</strong> ${group.begin_date}</p>
-                                            <p><strong>Дата окончания:</strong> ${group.finish_date}</p>
-                                        </div>
-                                        <div class="mt-auto">
-                                            <form action="{% url "new_statement" %}" method="POST">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="group_id" value="${group.id}">
-                                                <button style="background: #9999FF; border: #9999FF" class="btn btn-primary w-100 mb-2">Выбрать</button>
-                                            </form>
+                        if (data.courses.length === 0) {
+                            noGroupsMessage.style.display = 'block';
+                        } else {
+                            data.courses.forEach(group => {
+                                const groupCard = `
+                                    <div class="col">
+                                        <div class="card p-3">
+                                            <div>
+                                                <h5 class="card-title">${group.group_name}</h5>
+                                                <p><strong>Курс:</strong> ${group.course_name}</p>
+                                                <p><strong>Дата начала:</strong> ${group.begin_date}</p>
+                                                <p><strong>Дата окончания:</strong> ${group.finish_date}</p>
+                                            </div>
+                                            <div class="mt-auto">
+                                                <form action="{% url "new_statement" %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="group_id" value="${group.id}">
+                                                    <button style="background: #9999FF; border: #9999FF" class="btn btn-primary w-100 mb-2">Выбрать</button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            `;
-                            coursesList.insertAdjacentHTML('beforeend', groupCard);
-                        });
+                                `;
+                                coursesList.insertAdjacentHTML('beforeend', groupCard);
+                            });
+                        }
                     }
                 });
         }

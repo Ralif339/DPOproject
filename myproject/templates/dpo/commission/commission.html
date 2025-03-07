@@ -66,8 +66,12 @@
                 <h5 class="card-title">{{ member.surname }} {{ member.name }} {{ member.patronymic }}</h5>
                 <p class="card-text">{{ member.position }}</p>
                 <div class="mt-auto">
-                    <button class="btn btn-edit w-100 mb-2">Редактировать</button>
-                    <button class="btn btn-delete w-100">Удалить</button>
+                    <a class="btn btn-edit w-100 mb-2" href="{% url "commission_edit" member.id %}">Редактировать</a>
+                    <form action="{% url "commission" %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="member_id" value={{member.id}}>
+                        <button type="submit" class="btn btn-delete w-100">Удалить</button>
+                    </form>
                 </div>
             </div>
         </div>

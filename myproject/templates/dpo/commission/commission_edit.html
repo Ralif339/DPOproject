@@ -1,0 +1,16 @@
+{% extends "manager_navigation.html" %}
+
+{% block title %}Редактирование члена комиссии{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h2>Редактирование члена комиссии</h2>
+    <form action="{% url "commission_edit" commission.id %}" method="post">
+        {% csrf_token %}
+        {{form.as_p}}
+        <button type="submit" class='btn btn-success'>Подтвердить</button>
+
+    </form>
+
+</div>
+{% endblock content %}

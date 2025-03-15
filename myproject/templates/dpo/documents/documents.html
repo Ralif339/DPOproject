@@ -1,0 +1,75 @@
+{% extends "manager_navigation.html" %}
+{% load static %}
+
+{% block title %}Приказы{% endblock title %}
+
+{% block style %}
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .btn-primary {
+        background:rgb(136, 136, 255);
+        border: #9999FF;
+    }
+    .btn-primary:hover {
+        background:rgb(118, 118, 231);
+        border: rgb(118, 118, 231);
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center fw-bold">📜 Документы</h2>
+
+    <!-- Секция Приказов -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card p-3 rounded-3">
+                <h5 class="card-title text-center pb-2"><i class="bi bi-file-earmark-text"></i> Приказы</h5>
+                <div class="row g-2">
+                    <div class="col-md-4"><a href="{% url "enroll_order" %}" class="btn btn-primary w-100"><i class="bi bi-person-check"></i> На зачисление</a></div>
+                    <div class="col-md-4"><button class="btn btn-primary w-100"><i class="bi bi-person-x"></i> На отчисление</button></div>
+                    <div class="col-md-4"><button class="btn btn-primary w-100"><i class="bi bi-person-dash"></i> На отчисление (по завершению)</button></div>
+                    <div class="col-md-6"><button class="btn btn-primary w-100"><i class="bi bi-people"></i> О назначении аттестационной комиссии</button></div>
+                    <div class="col-md-6"><button class="btn btn-primary w-100"><i class="bi bi-award"></i> О допуске к итоговой аттестации</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Секция Экзаменационных документов -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card p-3 rounded-3">
+                <h5 class="card-title text-center pb-2"><i class="bi bi-journal-text"></i> Экзаменационные документы</h5>
+                <div class="row g-2">
+                    <div class="col-md-6"><button class="btn btn-success w-100"><i class="bi bi-pencil-square"></i> Протокол экзамена</button></div>
+                    <div class="col-md-6"><button class="btn btn-success w-100"><i class="bi bi-list-check"></i> Итоговая аттестационная ведомость</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Секция Журнала занятий -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card p-3 rounded-3">
+                <h5 class="card-title text-center pb-2"><i class="bi bi-book"></i> Журнал занятий</h5>
+                <button class="btn btn-warning w-100"><i class="bi bi-journal-bookmark"></i> Журнал занятий</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock content %}

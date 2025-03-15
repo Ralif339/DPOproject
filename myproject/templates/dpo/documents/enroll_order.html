@@ -1,0 +1,28 @@
+{% extends "manager_navigation.html" %}
+
+{% block title %}Выгрузка приказа на зачисление{% endblock title %}
+
+{% block style %}{% endblock style %}
+
+{% block content %}
+<div class="container">
+    <h2>Формирование приказа на зачисление</h2>
+    <form action="{% url "enroll_order" %}" method="POST">
+        {% csrf_token %}
+        <label for="doc_number">Номер документа: </label>
+        <input type="text" id="doc_number" name="doc_number"><br>
+        <label for="date">Дата документа: </label>
+        <input type="date" id="date" name="date"><br>
+        <label for="groups">Группа: </label>
+        <select name="selected_group" id="groups">
+            {% for group in groups %}
+                <option value="{{ group.id }}">{{ group.name }}</option>
+            {% endfor %}
+        </select><br>
+        <button type="submit" class="btn btn-success">Сформировать</button>
+    </form>
+
+</div>
+
+
+{% endblock content %}

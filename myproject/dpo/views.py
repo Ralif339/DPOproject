@@ -5,6 +5,9 @@ from .forms import *
 from django.utils import timezone
 from django.contrib import messages
 from django.db.models import Count, OuterRef, Subquery
+from student import forms as dpo_forms
+from .doc_generation import *
+
 
 
 def superuser_render(request, template: str, context=None):
@@ -20,9 +23,6 @@ def superuser_render(request, template: str, context=None):
 # Create your views here.
 def students_view(request):
     students = User.objects.all().filter(is_superuser="False")
-    for student in students:
-        for groups in student.group_set.all():
-            print(student.name, groups.name)
     return superuser_render(request, "dpo/students/students.html", context={"students": students})
 
 def student_profile_view(request, student_id):
@@ -115,7 +115,7 @@ def statements_view(request):
                 statement.save()
             return redirect("statements")
         
-    statements = Statements.objects.filter(status="На рассмотрении")
+    statements = Statements.objects.all()
     groups = Group.objects.all()
     return superuser_render(request, 'dpo/statements.html', context={"statements": statements,
                                                                      "groups": groups,
@@ -133,8 +133,8 @@ def commission_view(request):
     return superuser_render(request, 'dpo/commission/commission.html', context={"commission": commission})
 
 
-def orders_view(request):
-    return superuser_render(request, 'dpo/orders.html')
+def documents_view(request):
+    return superuser_render(request, 'dpo/documents/documents.html')
 
 
 def teachers_view(request):
@@ -230,4 +230,28 @@ def commission_edit_view(request, member_id):
         return redirect('commission')
     form = CommissionAddForm(instance=commission)
     context = {"form": form, "commission": commission}
-    return render(request, 'dpo/commission/commission_edit.html', context)
+    return superuser_render(request, 'dpo/commission/commission_edit.html', context)
+
+
+def student_edit_view(request, student_id):
+    student = User.objects.get(id=student_id)
+    if request.method == "POST":
+        form = dpo_forms.StudentInfoForm(request.POST, instance=student)
+        if form.is_valid():
+            form.save()
+            return redirect('index')
+    form = dpo_forms.StudentInfoForm(instance=student)
+    return superuser_render(request, 'dpo/students/student_edit.html', context={"form": form,
+                                                                          "student": student})
+    
+def enroll_order_view(request):
+    groups = Group.objects.all()
+    context = {"groups": groups,}
+    if request.method == "POST":
+        selected_group = request.POST.get("selected_group")
+        doc_number = request.POST.get('doc_number')
+        date = request.POST.get("date")
+        response = get_enroll_docx(selected_group, doc_number, date)
+        return response
+    return superuser_render(request, "dpo/documents/enroll_order.html", context=context)    
+    

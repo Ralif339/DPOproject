@@ -49,11 +49,22 @@ def get_courses(request):
         courses = Course.objects.filter(
             group__finish_date__gte=timezone.now().date()
         ).distinct()
+
+        # Исключаем курсы, на которые у пользователя уже есть заявления
+        existing_statements = Statements.objects.filter(
+            student=user,
+            statement_type="зачисление",
+            status__in=["На рассмотрении", "Отклонено"]
+        ).values_list('course_id', flat=True)
+
+        courses = courses.exclude(id__in=existing_statements)
+
         courses_data = [{
             'id': course.id,
             'course_name': course.course_name,
             'course_type': course.course_type,
-            'price': str(course.price),
+            'price_b': str(course.price_b),
+            'price_vb': str(course.price_vb),
             'hours_count': course.hours_count,
         } for course in courses]
 
@@ -62,6 +73,16 @@ def get_courses(request):
         groups = Group.objects.filter(
             studentgroup__student=user
         ).distinct()
+
+        # Исключаем группы, на которые у пользователя уже есть заявления на отчисление
+        existing_statements = Statements.objects.filter(
+            student=user,
+            statement_type="отчисление",
+            status__in=["На рассмотрении", "Отклонено"]
+        ).values_list('group_id', flat=True)
+
+        groups = groups.exclude(id__in=existing_statements)
+
         courses_data = [{
             'id': group.id,
             'group_name': group.name,

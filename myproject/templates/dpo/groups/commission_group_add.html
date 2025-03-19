@@ -1,0 +1,41 @@
+{% extends "manager_navigation.html" %}
+
+{% block title %}Добавление комиссии{% endblock title %}
+
+{% block style %}{% endblock style %}
+
+{% block content %}
+<div class="container">
+    <h2>Добавление комиссии для группы </h2>
+    <form action="{% url "commission_group_add" group.id %}" method="POST">
+        {% csrf_token %}
+        <div class="d-flex flex-column mb-3">
+        <label for="сhairman">Председатель комиссии</label>
+        <select name="сhairman" id="сhairman">
+            {% for member in members %}
+                <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
+            {% endfor %}
+        </select>
+        <label for="deputy">Заместитель председателя комиссии</label>
+        <select name="deputy" id="deputy">
+            {% for member in members %}
+                <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
+            {% endfor %}
+        </select>
+        <label for="secretary">Секретарь</label>
+        <select name="secretary" id="secretary">
+            {% for member in members %}
+                <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
+            {% endfor %}
+        </select>
+        <label for="member">Член комиссии</label>
+        <select name="member" id="member">
+            {% for member in members %}
+                <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class='btn btn-success'>Добавить</button>
+    </div>
+    </form>
+</div>
+{% endblock content %}

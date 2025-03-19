@@ -1,6 +1,6 @@
 {% extends "manager_navigation.html" %}
 
-{% block title %}Выгрузка приказа на зачисление{% endblock title %}
+{% block title %}Назначение комиссии{% endblock title %}
 
 {% block style %}
 <style>
@@ -16,8 +16,8 @@
 
 {% block content %}
 <div class="container">
-    <h2 class="text-center mb-4">Формирование приказа на зачисление</h2>
-    <form action="{% url 'enroll_order' group_id %}" method="POST" class="needs-validation" novalidate>
+    <h2 class="text-center mb-4">Формирование приказа о назначении комиссии</h2>
+    <form action="{% url 'commission_order' group_id %}" method="POST" class="needs-validation" novalidate>
         {% csrf_token %}
         <div class="form-group">
             <label for="doc_number">Номер документа:</label>

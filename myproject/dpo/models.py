@@ -7,7 +7,8 @@ from index.models import User
 class Course(models.Model):
     course_name = models.CharField(max_length=255, verbose_name="Название курса")
     course_type = models.CharField(max_length=255, verbose_name="Тип курса")
-    price = models.FloatField(verbose_name="Цена")
+    price_b = models.FloatField(verbose_name="Цена бюджет", null=True)
+    price_vb = models.FloatField(verbose_name="Цена внебюджет", null=True)
     hours_count = models.IntegerField(verbose_name="Количество часов")
     
     class Meta: 
@@ -68,4 +69,9 @@ class Statements(models.Model):
     submitting_date = models.DateField(verbose_name="Дата подачи")
     status = models.CharField(max_length=128, verbose_name="Статус заявления", default="На рассмотрении")
     course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name="Выбранный курс", null=True)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name="Группа", null=True)
+    
+class Orders(models.Model):
+    date = models.DateField(verbose_name="Дата составления")
+    number = models.CharField(max_length=128, verbose_name="Номер приказа")
     group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name="Группа", null=True)

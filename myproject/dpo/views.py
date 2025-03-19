@@ -63,7 +63,9 @@ def group_detail_view(request, group_id):
     expelled_students = StudentExpulsion.objects.filter(group=group).values_list("student_id", flat=True)
     student_groups = StudentGroup.objects.filter(group=group).exclude(student_id__in=expelled_students).select_related("student").order_by("student__surname")
     student_count = student_groups.count()
-    context ={"group": group, "student_groups": student_groups, "student_count": student_count}
+    group_commission = GroupCommission.objects.filter(group=group)
+    context ={"group": group, "student_groups": student_groups, 
+              "student_count": student_count, "group_commission": group_commission,}
     return render(request, 'dpo/groups/group_detail.html', context)
 
 def finish_course(request, group_id):
@@ -244,14 +246,56 @@ def student_edit_view(request, student_id):
     return superuser_render(request, 'dpo/students/student_edit.html', context={"form": form,
                                                                           "student": student})
     
-def enroll_order_view(request):
+def enroll_order_view(request, group_id):
     groups = Group.objects.all()
-    context = {"groups": groups,}
+    context = {"groups": groups, "group_id": group_id}
     if request.method == "POST":
-        selected_group = request.POST.get("selected_group")
         doc_number = request.POST.get('doc_number')
         date = request.POST.get("date")
-        response = get_enroll_docx(selected_group, doc_number, date)
+        order = Orders(date=date, number=doc_number, group=Group.objects.get(id=group_id))
+        order.save()
+        response = get_enroll_docx(group_id, doc_number, date)
         return response
-    return superuser_render(request, "dpo/documents/enroll_order.html", context=context)    
+    return superuser_render(request, "dpo/documents/enroll_order.html", context=context)   
+
     
+def commission_order_view(request, group_id):
+    groups = Group.objects.all()
+    context = {"groups": groups, "group_id": group_id,}
+    if request.method == "POST":
+        doc_number = request.POST.get('doc_number')
+        date = request.POST.get("date")
+        response = get_commission_docx(group_id, doc_number, date)
+        return response
+    return superuser_render(request, "dpo/documents/commission_order.html", context=context) 
+
+def commission_group_add_view(request, group_id):
+    group = Group.objects.get(id=group_id)
+    members = CommissionMember.objects.all()
+    if request.method == "POST":
+        chairman = CommissionMember(id=request.POST.get("сhairman"))
+        new_member = GroupCommission(group=group, commission_member=chairman, role="Председатель комиссии")
+        new_member.save()
+        
+        deputy = CommissionMember(request.POST.get("deputy"))
+        new_member = GroupCommission(group=group, commission_member=deputy, role="Заместитель председателя комиссии")
+        new_member.save()
+        
+        secretary = CommissionMember(request.POST.get("secretary"))
+        new_member = GroupCommission(group=group, commission_member=secretary, role="Секретарь")
+        new_member.save()
+        
+        member = CommissionMember(request.POST.get("member"))
+        new_member = GroupCommission(group=group, commission_member=member, role="Член комиссии")
+        new_member.save()
+        
+        expelled_students = StudentExpulsion.objects.filter(group=group).values_list("student_id", flat=True)
+        student_groups = StudentGroup.objects.filter(group=group).exclude(student_id__in=expelled_students).select_related("student").order_by("student__surname")
+        student_count = student_groups.count()
+        group_commission = GroupCommission.objects.filter(group=group)
+        context ={"group": group, "student_groups": student_groups, 
+              "student_count": student_count, "group_commission": group_commission,}
+        return superuser_render(request, 'dpo/groups/group_detail.html', context)
+    
+    context = {"group": group, "members": members}
+    return superuser_render(request, 'dpo/groups/commission_group_add.html', context=context)

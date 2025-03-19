@@ -34,7 +34,7 @@ class CourseAddForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = [
-            'course_name', 'course_type', 'price', 'hours_count',
+            'course_name', 'course_type', 'price_b', 'price_vb', 'hours_count',
         ]
         
 class TeacherAddForm(forms.ModelForm):    

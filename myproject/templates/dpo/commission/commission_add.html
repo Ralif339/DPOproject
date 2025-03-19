@@ -11,7 +11,6 @@
 
     <div class="container">
         <h2>Добавление члена комиссии</h2>
-        <p>Преподаватель?</p>
         <form action="{% url "commission_add" %}" method="POST">
             {% csrf_token %}
             {{ form.as_p }}

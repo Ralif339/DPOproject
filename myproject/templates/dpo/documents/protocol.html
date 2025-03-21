@@ -16,6 +16,45 @@
 
 {% block content %}
 <div class="container">
-    <h2>Протокол экзамена</h2>
+    <h2 class="text-center mb-4">Формирование протокола экзамена</h2>
+    <form action="{% url 'protocol' group_id %}" method="POST" class="needs-validation" novalidate>
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="doc_number">Номер документа:</label>
+            <input type="text" class="form-control" id="doc_number" name="doc_number" required>
+            <div class="invalid-feedback">
+                Пожалуйста, введите номер документа.
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="date">Дата составления документа:</label>
+            <input type="date" class="form-control" id="date" name="date" required>
+            <div class="invalid-feedback">
+                Пожалуйста, выберите дату документа.
+            </div>
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-success btn-block btns">Сформировать</button>
+        </div>
+        
+    </form>
 </div>
+
+<script>
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+    </script>
 {% endblock content %}

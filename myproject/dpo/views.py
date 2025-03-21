@@ -91,7 +91,8 @@ def finish_course(request, group_id):
                     date=timezone.now().date(),
                     group=group
                 )
-
+                
+        group.status = "Неактивна"
         messages.success(request, "Все студенты отчислены по причине завершения курса.")
         return redirect("group_detail", group_id=group.id)
 
@@ -252,8 +253,11 @@ def enroll_order_view(request, group_id):
     if request.method == "POST":
         doc_number = request.POST.get('doc_number')
         date = request.POST.get("date")
-        order = Orders(date=date, number=doc_number, group=Group.objects.get(id=group_id))
-        order.save()
+        order, created = Orders.objects.get_or_create(
+            date=date,
+            number=doc_number,
+            defaults={'group': Group.objects.get(id=group_id)}
+        )
         response = get_enroll_docx(group_id, doc_number, date)
         return response
     return superuser_render(request, "dpo/documents/enroll_order.html", context=context)   
@@ -299,3 +303,16 @@ def commission_group_add_view(request, group_id):
     
     context = {"group": group, "members": members}
     return superuser_render(request, 'dpo/groups/commission_group_add.html', context=context)
+
+def lesson_log_view(request, group_id):
+    response = get_lesson_log_docx(group_id)
+    return response
+
+def protocol_view(request, group_id):
+    context = {"group_id": group_id,}
+    if request.method == "POST":
+        doc_number = request.POST.get('doc_number')
+        date = request.POST.get("date")
+        response = get_protocol_docx(group_id, doc_number, date)
+        return response
+    return superuser_render(request, "dpo/documents/protocol.html", context=context) 

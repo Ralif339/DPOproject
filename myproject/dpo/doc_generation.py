@@ -5,6 +5,10 @@ from django.http import HttpResponse
 from docx.shared import Pt
 from transliterate import translit
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from datetime import datetime
+import locale
+
+locale.setlocale(locale.LC_TIME, 'Russian')
 
 def set_font(paragraph, pt: float, ):
     for run in paragraph.runs:
@@ -170,5 +174,150 @@ def get_commission_docx(group_id, number, date):
     
     response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
     response['Content-Disposition'] = f'attachment; filename="commission_order_{safe_group_name}.docx"'
+    
+    return response
+
+
+def get_lesson_log_docx(group_id):
+    group = Group.objects.get(id=group_id)
+    expelled_students = StudentExpulsion.objects.filter(group=group).values_list("student_id", flat=True)
+    student_groups = StudentGroup.objects.filter(group=group).exclude(student_id__in=expelled_students).select_related("student").order_by("student__surname")
+    document = docx.Document('dpo/docs_patterns/lesson_log.docx')
+    
+    p = document.paragraphs[0]
+    replace_text(p, "<CourseName>", f"{group.course.course_name}", 11)
+    for run in p.runs:
+        run.font.name = "GOST type A"
+        run.italic = True
+        
+    p = document.paragraphs[2]
+    replace_text(p, "<TeacherFIO>", f"{group.teacher.surname} {group.teacher.name}. {group.teacher.patronymic}.", 12)
+    for run in p.runs:
+        run.font.name = "GOST type A"
+        run.italic = True
+        
+    table1 = document.tables[0]
+    table1.rows[2].cells[0].text = group.name
+    table1.rows[2].cells[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    
+    students = []
+    if student_groups:
+        students = [f"{student_group.student.surname} {student_group.student.name[0]}. {student_group.student.patronymic[0]}."
+                    for student_group in student_groups]
+    
+        students.sort(reverse=True)
+
+        for row in table1.rows[3:]:
+            while students:
+                row.cells[1].text = students.pop()
+        
+    buffer = io.BytesIO()
+    document.save(buffer)
+    buffer.seek(0)
+    
+    safe_group_name = sanitize_filename(group.name) 
+    
+    response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    response['Content-Disposition'] = f'attachment; filename="lesson_log_{safe_group_name}.docx"'
+    
+    return response
+
+def get_protocol_docx(group_id, doc_number, date):
+    group = Group.objects.get(id=group_id)
+    expelled_students = StudentExpulsion.objects.filter(group=group).values_list("student_id", flat=True)
+    student_groups = StudentGroup.objects.filter(group=group).exclude(student_id__in=expelled_students).select_related("student").order_by("student__surname")
+    document = docx.Document('dpo/docs_patterns/protocol.docx')
+    # Преобразуем строку в объект datetime
+    date_obj = datetime.strptime(date, '%Y-%m-%d')
+
+    # Форматируем дату в нужный формат
+    formatted_date = date_obj.strftime('«%d» %B %Y г.')
+    
+    p = document.paragraphs[17]
+    replace_text(p, "<Number>", f"{doc_number}", 11)
+    replace_text(p, "<Date>", f"{formatted_date}", 11)
+    
+    for group_commission in GroupCommission.objects.filter(group=group):
+        match group_commission.role:
+            case "Председатель комиссии":
+                p = document.paragraphs[22]
+                chairmanFIO = f"{group_commission.commission_member.surname} {group_commission.commission_member.name[0]}. {group_commission.commission_member.patronymic[0]}."
+                replace_text(p, "<ChairmanFIO>", chairmanFIO, 11)
+                replace_text(p, "<ChairmanPosition>", group_commission.commission_member.position, 11)
+                p = document.paragraphs[32]
+                replace_text(p, "<ChairmanFIO>", chairmanFIO, 11)
+            case "Заместитель председателя комиссии":
+                p = document.paragraphs[23]
+                deputyFIO = f"{group_commission.commission_member.surname} {group_commission.commission_member.name[0]}. {group_commission.commission_member.patronymic[0]}."
+                replace_text(p, "<DeputyFIO>", deputyFIO, 11)
+                replace_text(p, "<DeputyPosition>", group_commission.commission_member.position, 11)
+                p = document.paragraphs[34]
+                replace_text(p, "<DeputyFIO>", deputyFIO, 11)
+            case "Член комиссии":
+                p = document.paragraphs[24]
+                memberFIO = f"{group_commission.commission_member.surname} {group_commission.commission_member.name[0]}. {group_commission.commission_member.patronymic[0]}."
+                replace_text(p, "<MemberFIO>", memberFIO, 11)
+                replace_text(p, "<MemberPosition>", group_commission.commission_member.position, 11)
+                p = document.paragraphs[36]
+                replace_text(p, "<MemberFIO>", memberFIO, 11)
+            case "Секретарь":
+                p = document.paragraphs[25]
+                secretaryFIO = f"{group_commission.commission_member.surname} {group_commission.commission_member.name[0]}. {group_commission.commission_member.patronymic[0]}."
+                replace_text(p, "<SecretaryFIO>", secretaryFIO, 11)
+                p = document.paragraphs[38]
+                replace_text(p, "<SecretaryFIO>", secretaryFIO, 11)
+    
+    p = document.paragraphs[26]
+    match group.course.course_type:
+        case "Профессиональная переподготовка":
+            replace_text(p, "<CourseType>", "программе профессиональной подготовки", 11)
+        case "Курсы повышения квалификации КПК":
+            replace_text(p, "<CourseType>", "программе повышения квалификации КПК", 11)            
+        case "Общеобразовательные программы для детей и взрослых":
+            replace_text(p, "<CourseType>", "общеобразовательной программе для детей и взрослых", 11)            
+        case "Профессиональное обучение":
+            replace_text(p, "<CourseType>", "программе профессионального обучения", 11)
+    replace_text(p, "<CourseName>", group.course.course_name, 11)
+    
+    p = document.paragraphs[27]
+    begin_date_str = group.begin_date.strftime('%d.%m.%Y г.')
+    finish_date_str = group.finish_date.strftime('%d.%m.%Y г.')
+    print(p.text)
+    replace_text(p, "<BeginDate>", f"{begin_date_str}", 11)
+    replace_text(p, "<FinishDate>", f"{finish_date_str}", 11)
+    
+    table = document.tables[0]
+    students = []
+    if student_groups:
+        students = [f"{student_group.student.surname} {student_group.student.name} {student_group.student.patronymic}"
+                    for student_group in student_groups]
+    
+        students.sort(reverse=True)
+
+        for row in table.rows[3:]:
+            while students:
+                row.cells[1].text = students.pop()
+                p = row.cells[1].paragraphs[0]
+                for run in p.runs:
+                    run.font.name = "Cambria"
+                    run.font.size = Pt(10)
+                
+                
+    for row in table.rows:
+        for cell in row.cells:
+            if "<CourseName>" in cell.text:
+                cell.text = group.course.course_name
+                p = cell.paragraphs[0]
+                set_font(p, 11)
+                p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    
+    buffer = io.BytesIO()
+    document.save(buffer)
+    buffer.seek(0)
+    
+    safe_group_name = sanitize_filename(group.name) 
+    
+    response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    response['Content-Disposition'] = f'attachment; filename="protocol_{safe_group_name}.docx"'
     
     return response

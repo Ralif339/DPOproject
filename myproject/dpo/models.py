@@ -45,6 +45,7 @@ class Group(models.Model):
     finish_date = models.DateField(verbose_name="Дата окончания")
     student = models.ManyToManyField(User, through="StudentGroup")
     commission = models.ManyToManyField(CommissionMember, through="GroupCommission")
+    status = models.CharField(max_length=128, verbose_name="Статус", null=True)
     
 class StudentExpulsion(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Слушатель")

@@ -14,6 +14,7 @@ urlpatterns = [
     path('documents/', documents_view, name="documents"),
     path('enroll_order/<int:group_id>/', enroll_order_view, name="enroll_order"),
     path('commission_order/<int:group_id>/', commission_order_view, name="commission_order"),
+    path('protocol/<int:group_id>/', protocol_view, name="protocol"),
     path('teachers/', teachers_view, name="teachers"),
     path('courses/', courses_view, name="courses"),
     path('course_edit/<int:course_id>/', course_edit_view, name='course_edit'),
@@ -24,4 +25,5 @@ urlpatterns = [
     path('commission_add/', add_commission_view, name="commission_add"),
     path('commission_edit/<int:member_id>/', commission_edit_view, name="commission_edit"),
     path("group/<int:group_id>/finish-course/", finish_course, name="finish_course"),
+    path("lesson_log/<int:group_id>/", lesson_log_view, name="lesson_log"),
 ]

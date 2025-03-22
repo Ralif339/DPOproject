@@ -33,7 +33,7 @@
                 <a href="{% url "enroll_order" group.id %}" class="btn btn-primary">Приказ о зачислении</a>
                 <a href="{% url "commission_order" group.id %}" class="btn btn-primary">Приказ о назначении комиссии</a>
                 <a href="{% url "protocol" group.id %}" class="btn btn-primary">Протокол экзамена</a>
-                <a href="" class="btn btn-primary">Аттестационная ведомость</a>
+                <a href="{% url "exam_sheet" group.id %}" class="btn btn-primary">Аттестационная ведомость</a>
                 <a href="{% url "lesson_log" group.id %}" class="btn btn-primary">Журнал занятий</a>
                 <a href="" class="btn btn-primary">Приказ о завершении обучения</a>
             </div>

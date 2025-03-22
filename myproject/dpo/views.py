@@ -316,3 +316,14 @@ def protocol_view(request, group_id):
         response = get_protocol_docx(group_id, doc_number, date)
         return response
     return superuser_render(request, "dpo/documents/protocol.html", context=context) 
+
+def exam_sheet_view(request, group_id):
+    orders = Orders.objects.filter(group=Group.objects.get(id=group_id))
+    context = {"group_id": group_id, "orders": orders}
+    if request.method == "POST":
+        doc_number = request.POST.get('doc_number')
+        date = request.POST.get("date")
+        order = Orders.objects.get(id=request.POST.get("order_id"))
+        response = get_exam_sheet_docx(group_id, doc_number, date, order)
+        return response
+    return superuser_render(request, "dpo/documents/exam_sheet.html", context=context)

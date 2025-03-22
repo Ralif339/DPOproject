@@ -7,6 +7,8 @@ from transliterate import translit
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from datetime import datetime
 import locale
+from docx.oxml.shared import OxmlElement
+from docx.oxml.ns import qn
 
 locale.setlocale(locale.LC_TIME, 'Russian')
 
@@ -25,6 +27,27 @@ def sanitize_filename(filename):
     # Заменяем проблемные символы на _
     filename = ''.join(c if c.isalnum() or c in (' ', '.') else '_' for c in filename)
     return filename
+
+def set_cell_borders(cell):
+    """
+    Устанавливает границы для ячейки.
+    """
+    tc = cell._tc
+    tcPr = tc.get_or_add_tcPr()
+
+    # Создаем элемент границ
+    tcBorders = OxmlElement('w:tcBorders')
+
+    # Добавляем границы (верхняя, нижняя, левая, правая)
+    for border_type in ['top', 'bottom', 'left', 'right']:
+        border = OxmlElement(f'w:{border_type}')
+        border.set(qn('w:sz'), '5')  # Толщина границы (в восьмых частях точки)
+        border.set(qn('w:val'), 'single')  # Тип линии (single, double и т.д.)
+        border.set(qn('w:color'), '000000')  # Цвет границы (черный)
+        tcBorders.append(border)
+
+    # Добавляем границы в свойства ячейки
+    tcPr.append(tcBorders)
 
 def get_enroll_docx(group_id, number, date):
     group = Group.objects.get(id=group_id)
@@ -319,5 +342,98 @@ def get_protocol_docx(group_id, doc_number, date):
     
     response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
     response['Content-Disposition'] = f'attachment; filename="protocol_{safe_group_name}.docx"'
+    
+    return response
+
+
+def get_exam_sheet_docx(group_id, doc_number, date, order):
+    group = Group.objects.get(id=group_id)
+    expelled_students = StudentExpulsion.objects.filter(group=group).values_list("student_id", flat=True)
+    student_groups = StudentGroup.objects.filter(group=group).exclude(student_id__in=expelled_students).select_related("student").order_by("student__surname")
+    document = docx.Document('dpo/docs_patterns/exam_sheet.docx')
+
+    date_obj = datetime.strptime(date, '%Y-%m-%d')
+    formatted_date = date_obj.strftime('«%d» %B %Y г.')
+    
+    p = document.paragraphs[0]
+    order_date = order.date.strftime('%d.%m.%Y')
+    replace_text(p, "<OrderDate>", f"{order_date}", 11)
+    replace_text(p, "<OrderNumber>", f"{order.number}", 11)
+    
+    p = document.paragraphs[5]
+    replace_text(p, "<Number>", f"{doc_number}", 12)
+    for run in p.runs:
+        run.bold = True
+    
+    p = document.paragraphs[8]
+    replace_text(p, "<CourseType>", f"{group.course.course_type}", 12)
+    
+    p = document.paragraphs[10]
+    replace_text(p, "<CourseName>", f"{group.course.course_name}", 12)
+    
+    p = document.paragraphs[11]
+    replace_text(p, "<Date>", f"{formatted_date}", 12)
+    
+    p = document.paragraphs[13]
+    replace_text(p, "<StudentCount>", f"{len(student_groups)}", 11)
+
+    table = document.tables[0]
+    students = []
+    if student_groups:
+        students = [f"{student_group.student.surname} {student_group.student.name} {student_group.student.patronymic}"
+                    for student_group in student_groups]
+    
+        students.sort(reverse=True)
+
+        i = 1
+        while students:
+            new_row = table.add_row()
+            new_row.cells[0].text = f"  {i}."
+            p = new_row.cells[0].paragraphs[0]
+            set_font(p, 12)
+            
+            new_row.cells[1].text = f"  {students.pop()}"
+            p = new_row.cells[1].paragraphs[0]
+            set_font(p, 10)
+            
+        new_row = table.add_row()
+        new_row.cells[0].merge(new_row.cells[1])
+        new_row.cells[0].text = "Средний балл итогового экзамена  "
+        p = new_row.cells[0].paragraphs[0]
+        set_font(p, 10)
+        p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
+    for row in table.rows:
+        for cell in row.cells:
+            set_cell_borders(cell)
+        row.height = None
+        
+    for group_commission in GroupCommission.objects.filter(group=group):
+        match group_commission.role:
+            case "Председатель комиссии":
+                p = document.paragraphs[16]
+                chairmanFIO = f"{group_commission.commission_member.surname} {group_commission.commission_member.name[0]}. {group_commission.commission_member.patronymic[0]}."
+                replace_text(p, "<ChairmanFIO>", chairmanFIO, 11)
+            case "Заместитель председателя комиссии":
+                p = document.paragraphs[18]
+                deputyFIO = f"{group_commission.commission_member.surname} {group_commission.commission_member.name[0]}. {group_commission.commission_member.patronymic[0]}."
+                replace_text(p, "<DeputyFIO>", deputyFIO, 11)
+            case "Член комиссии":
+                p = document.paragraphs[20]
+                memberFIO = f"{group_commission.commission_member.surname} {group_commission.commission_member.name[0]}. {group_commission.commission_member.patronymic[0]}."
+                replace_text(p, "<MemberFIO>", memberFIO, 11)
+            case "Секретарь":
+                p = document.paragraphs[22]
+                secretaryFIO = f"{group_commission.commission_member.surname} {group_commission.commission_member.name[0]}. {group_commission.commission_member.patronymic[0]}."
+                replace_text(p, "<SecretaryFIO>", secretaryFIO, 11)
+      
+    buffer = io.BytesIO()
+    document.save(buffer)
+    buffer.seek(0)
+    
+    safe_group_name = sanitize_filename(group.name) 
+    
+    response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    response['Content-Disposition'] = f'attachment; filename="exam_sheet_{safe_group_name}.docx"'
     
     return response

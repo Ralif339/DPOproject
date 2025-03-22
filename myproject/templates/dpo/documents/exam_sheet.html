@@ -16,6 +16,56 @@
 
 {% block content %}
 <div class="container">
-    <h2>Итоговая аттестационная ведомость</h2>
+    <h2 class="text-center mb-4">Формирование аттестационной ведомости</h2>
+    <form action="{% url 'exam_sheet' group_id %}" method="POST" class="needs-validation" novalidate>
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="doc_number">Номер документа:</label>
+            <input type="text" class="form-control" id="doc_number" name="doc_number" required>
+            <div class="invalid-feedback">
+                Пожалуйста, введите номер документа.
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="date">Дата составления документа:</label>
+            <input type="date" class="form-control" id="date" name="date" required>
+            <div class="invalid-feedback">
+                Пожалуйста, выберите дату документа.
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="order_id">К приказу:</label>
+            <select class="form-select" name="order_id" id="order_id" required>
+                {% for order in orders %}
+                    <option value="{{order.id}}">Приказ №{{order.number}} от {{order.date}}</option>
+                {% endfor %}
+            </select>
+            <div class="invalid-feedback">
+                Пожалуйста, выберите дату документа.
+            </div>
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-success btn-block btns">Сформировать</button>
+        </div>
+        
+    </form>
 </div>
+
+<script>
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+    </script>
 {% endblock content %}

@@ -15,6 +15,7 @@ urlpatterns = [
     path('enroll_order/<int:group_id>/', enroll_order_view, name="enroll_order"),
     path('commission_order/<int:group_id>/', commission_order_view, name="commission_order"),
     path('protocol/<int:group_id>/', protocol_view, name="protocol"),
+    path('exam_sheet/<int:group_id>/', exam_sheet_view, name="exam_sheet"),
     path('teachers/', teachers_view, name="teachers"),
     path('courses/', courses_view, name="courses"),
     path('course_edit/<int:course_id>/', course_edit_view, name='course_edit'),

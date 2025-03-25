@@ -1,6 +1,6 @@
 {% extends "manager_navigation.html" %}
 
-{% block title %}Итоговая аттестационная ведомость{% endblock title %}
+{% block title %}Отчисление группы{% endblock title %}
 
 {% block style %}
 <style>
@@ -21,9 +21,8 @@
 {% endblock style %}
 
 {% block content %}
-<div class="container">
-    <h2 class="text-center mb-4">Формирование аттестационной ведомости</h2>
-    <form action="{% url 'exam_sheet' group_id %}" method="POST" class="needs-validation" novalidate>
+<h2 class="text-center mb-4">Формирование приказа на отчисление группы (завершение обучения)</h2>
+    <form action="{% url 'expel_group' group_id %}" method="POST" class="needs-validation" novalidate>
         {% csrf_token %}
         <div class="form-group">
             <label for="doc_number">Номер документа:</label>
@@ -40,15 +39,12 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="order_id">К приказу:</label>
-            <select class="form-select" name="order_id" id="order_id" required>
-                {% for order in orders %}
-                    <option value="{{order.id}}">Приказ №{{order.number}} от {{order.date}}</option>
+            <label for="protocol_id">К протоколу:</label>
+            <select class="form-select" name="protocol_id" id="protocol_id" required>
+                {% for protocol in protocols %}
+                    <option value="{{protocol.id}}">Протокол №{{protocol.number}} от {{protocol.date}}</option>
                 {% endfor %}
             </select>
-            <div class="invalid-feedback">
-                Пожалуйста, выберите дату документа.
-            </div>
         </div>
         <div class="btn-container">
             <a href="{% url 'group_detail' group_id %}" class="btn btn-secondary">Назад</a>
@@ -74,5 +70,5 @@
             });
         }, false);
     })();
-    </script>
+</script>
 {% endblock content %}

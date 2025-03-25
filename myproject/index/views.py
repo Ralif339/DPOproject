@@ -3,15 +3,22 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import RegisterForm
 from django.contrib.auth import login
 from .models import User
+from dpo.models import StudentExpulsion
 
 
 # Create your views here.
 def index_view(request):
-    if request.user.is_superuser:
+    user = request.user
+    if user.is_superuser:
         return redirect('students')
     else:
-        if request.user.is_authenticated:
-            return render(request, 'index/student.html', context={})
+        if user.is_authenticated:
+            groups = user.group_set.all()
+            expelled_students = StudentExpulsion.objects.all()
+            status = ""
+            if user in expelled_students:
+                pass
+            return render(request, 'index/student.html', context={"groups": groups})
         else:
             return redirect('login')
         

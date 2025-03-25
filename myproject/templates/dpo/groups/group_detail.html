@@ -13,6 +13,18 @@
         background:rgb(128, 128, 249);
         border: rgb(128, 128, 249);
     }
+    .btn-edit {
+        background-color: #ffc107;
+        color: black;
+    }
+    .btn-edit:hover {
+        background-color: #e0a800;
+    }
+    /* Стили для отключенных кнопок */
+    .btn-primary:disabled {
+        background-color: #9999FF; /* Серый фон */
+        color: white; /* Темно-серый текст */
+    }
 </style>
 {% endblock style %}
 
@@ -24,18 +36,47 @@
         </div>
         <div class="card-body">
             <p><strong>Курс:</strong> {{group.course.course_name}}</p>
+            <p><strong>Статус:</strong> {{group.status}}</p>
             <p><strong>Дата начала:</strong> {{group.begin_date}}</p>
             <p><strong>Дата окончания:</strong> {{group.finish_date}}</p>
             <p><strong>Преподаватель:</strong> {{group.teacher.surname}} {{group.teacher.name}} {{group.teacher.patronymic}}</p>
-            <p><strong>Количество слушателей:</strong> <span id="total-students">{{student_count}}</span></p>
 
             <div class="d-flex flex-wrap gap-2">
                 <a href="{% url "enroll_order" group.id %}" class="btn btn-primary">Приказ о зачислении</a>
+                <a href="{% url "lesson_log" group.id %}" class="btn btn-primary">Журнал занятий</a>
+                
+                {% if has_commission %}
                 <a href="{% url "commission_order" group.id %}" class="btn btn-primary">Приказ о назначении комиссии</a>
                 <a href="{% url "protocol" group.id %}" class="btn btn-primary">Протокол экзамена</a>
-                <a href="{% url "exam_sheet" group.id %}" class="btn btn-primary">Аттестационная ведомость</a>
-                <a href="{% url "lesson_log" group.id %}" class="btn btn-primary">Журнал занятий</a>
-                <a href="" class="btn btn-primary">Приказ о завершении обучения</a>
+                
+                    {% if has_enrollment_order %}
+                    <a href="{% url "exam_sheet" group.id %}" class="btn btn-primary">Аттестационная ведомость</a>
+                    {% else %}
+                    <span title="Приказ о зачислении не сформирован">
+                        <button class="btn btn-primary" disabled>Аттестационная ведомость</button>
+                    </span>
+                    {% endif %}
+
+                {% else %}
+                <span title="Комиссия не назначена">
+                    <button class="btn btn-primary" disabled>Приказ о назначении комиссии</button>
+                </span>
+                <span title="Комиссия не назначена">
+                    <button class="btn btn-primary" disabled>Протокол экзамена</button>
+                </span>
+                <span title="Комиссия не назначена">
+                    <button class="btn btn-primary" disabled>Аттестационная ведомость</button>
+                </span>
+                {% endif %}
+
+                {% if has_exam_protocol and is_group_finished %}
+                <a href="{% url "expel_group" group.id %}" class="btn btn-primary">Приказ о завершении обучения</a>
+                {% else %}
+                <span title="Не сформирован протокол экзамена/Группа обучается">
+                    <button class="btn btn-primary" disabled >Приказ о завершении обучения</button>
+                </span>
+                {% endif %}
+                
             </div>
 
             <h4 class="mt-4">Аттестационная комиссия</h4>
@@ -68,19 +109,21 @@
                     {% endif %}
                 {% endfor %}
             </div>
+            <a href="{% url "commission_group_edit" group.id %}" class="btn btn-edit">Редактировать</a>
             {% endif %}
             
             <h4 class="mt-4">Список слушателей</h4>
+            {% if student_groups %}
             <table class="table table-bordered mt-2">
                 <thead class="table-dark">
                     <tr class="text-center">
                         <th>№</th>
                         <th>Имя</th>
                         <th>Форма обучения</th>
-                        <th>Действие</th>
+                        <th>Действия</th>
                     </tr>
                 </thead>
-                <tbody id="students-list">
+                <tbody>
                     {% for student_group in student_groups %}
                         <tr class="text-center">
                             <td>{{ forloop.counter }}</td>
@@ -99,7 +142,28 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% else %}
+                <table class="table table-bordered mt-2">
+                    <thead class="table-dark">
+                        <tr class="text-center">
+                            <th>№</th>
+                            <th>Имя</th>
+                            <th>Форма обучения</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student_ed_kind in students_ed_kind %}
+                            <tr class="text-center">
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ student_ed_kind.0.surname }} {{ student_ed_kind.0.name }} {{ student_ed_kind.0.patronymic }}</td>
+                                <td>{{ student_ed_kind.1|default:"-" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
             
+            {% if not is_group_finished %}
             <form id="finish-course-form" method="POST" action="{% url 'finish_course' group.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="student_ids" id="student-ids">
@@ -108,6 +172,11 @@
                     <button type="submit" id="remove-all" class="btn btn-warning mt-3">Завершить обучение</button>
                 </div>
             </form>
+            {% else %}
+                <div class="text-center">
+                    <button type="submit" id="remove-all" class="btn btn-warning mt-3" disabled>Завершить обучение</button>
+                </div>
+            {% endif %}
             
             
 

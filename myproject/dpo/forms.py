@@ -53,3 +53,4 @@ class CommissionAddForm(forms.ModelForm):
         fields = [
             'surname', 'name', 'patronymic', 'position',
         ]
+        

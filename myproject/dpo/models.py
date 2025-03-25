@@ -45,7 +45,7 @@ class Group(models.Model):
     finish_date = models.DateField(verbose_name="Дата окончания")
     student = models.ManyToManyField(User, through="StudentGroup")
     commission = models.ManyToManyField(CommissionMember, through="GroupCommission")
-    status = models.CharField(max_length=128, verbose_name="Статус", null=True)
+    status = models.CharField(max_length=128, verbose_name="Статус", null=True, default="Проходит обучение")
     
 class StudentExpulsion(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Слушатель")
@@ -73,6 +73,11 @@ class Statements(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name="Группа", null=True)
     
 class Orders(models.Model):
+    date = models.DateField(verbose_name="Дата составления")
+    number = models.CharField(max_length=128, verbose_name="Номер приказа")
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name="Группа", null=True)
+    
+class Protocols(models.Model):
     date = models.DateField(verbose_name="Дата составления")
     number = models.CharField(max_length=128, verbose_name="Номер приказа")
     group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name="Группа", null=True)

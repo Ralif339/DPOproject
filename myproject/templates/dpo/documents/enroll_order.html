@@ -11,6 +11,12 @@
         margin: 15px auto;
         width: 50%;
     }
+    .btn-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px; /* Расстояние между кнопками */
+        margin-top: 20px;
+    }
 </style>
 {% endblock style %}
 
@@ -33,10 +39,12 @@
                 Пожалуйста, выберите дату документа.
             </div>
         </div>
-        <div class="text-center">
-            <button type="submit" class="btn btn-success btn-block btns">Сформировать</button>
-        </div>
         
+        <!-- Контейнер для кнопок -->
+        <div class="btn-container">
+            <a href="{% url 'group_detail' group_id %}" class="btn btn-secondary">Назад</a>
+            <button type="submit" class="btn btn-success">Сформировать</button>
+        </div>
     </form>
 </div>
 
@@ -56,5 +64,5 @@
             });
         }, false);
     })();
-    </script>
+</script>
 {% endblock content %}

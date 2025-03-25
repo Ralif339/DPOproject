@@ -52,19 +52,14 @@
 
     <h4 class="mb-3">Курсы</h4>
     <div class="row row-cols-1 row-cols-md-2 g-4">
-        {% for group in user.group_set.all %}
+        {% for group in groups %}
         <div class="col">
             <div class="card p-3">
                 <h5 class="card-title">{{group.course.course_name}}</h5>
                 <p><strong> Группа:</strong> {{group.name}} </p>
                 <p><strong>📅 Срок обучения:</strong> {{group.begin_date}} - {{group.finish_date}}</p>
                 <p><strong>👨‍🏫 Преподаватель:</strong> {{group.teacher.surname}} {{group.teacher.name.0}}. {{group.teacher.patronymic.0}}.</p>
-                <p><strong>📌 Статус:</strong> 
-                    {% if group.finish_date|date:"Y-m-d" > today|date:"Y-m-d" %}
-                    Активно
-                    {% else %}
-                    Неактивно
-                    {% endif %} </p>
+                <p><strong>📌 Статус:</strong> {{group.status}}</p>
             </div>
         </div>
         {% endfor %}

@@ -437,3 +437,83 @@ def get_exam_sheet_docx(group_id, doc_number, date, order):
     response['Content-Disposition'] = f'attachment; filename="exam_sheet_{safe_group_name}.docx"'
     
     return response
+
+
+def get_expel_group_order_docx(group_id, doc_number, date, protocol):
+    group = Group.objects.get(id=group_id)
+    expelled_students = StudentExpulsion.objects.filter(reason="Завершение курса", group=group)
+    student_groups = StudentGroup.objects.filter(group=group)
+    students_ed_kind = []
+    
+    for student_group in student_groups:
+        for expelled_student in expelled_students:
+            if expelled_student.student.id == student_group.student.id:
+                students_ed_kind.append((student_group.student, student_group.ed_kind))
+    
+    document = docx.Document('dpo/docs_patterns/expel_group.docx')
+
+    table1 = document.tables[0]
+    p = table1.cell(1, 0).paragraphs[0]
+    table1.cell(1, 0).text = doc_number
+    table1.cell(1, 1).text = date
+    for cell in table1.rows[1].cells:
+        for run in cell.paragraphs[0].runs:
+            run.font.name = "Times New Roman"
+            run.font.size = Pt(11)
+            run.bold = True
+        cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    
+    p = document.paragraphs[9]
+    print(p.text, "p[9]")
+    protocol_date = protocol.date.strftime('%d.%m.%Y г.')
+    replace_text(p, "<ProtocolDate>", f"{protocol_date}", 11)
+    replace_text(p, "<ProtocolNumber>", f"{protocol.number}", 11)
+    
+    p = document.paragraphs[12]
+    print(p.text, "p[12]")
+    match group.course.course_type:
+        case "Профессиональная переподготовка":
+            replace_text(p, "<CourseType>", "программе профессиональной подготовки", 11)
+        case "Курсы повышения квалификации КПК":
+            replace_text(p, "<CourseType>", "программе повышения квалификации КПК", 11)            
+        case "Общеобразовательные программы для детей и взрослых":
+            replace_text(p, "<CourseType>", "общеобразовательной программе для детей и взрослых", 11)            
+        case "Профессиональное обучение":
+            replace_text(p, "<CourseType>", "программе профессионального обучения", 11)
+    replace_text(p, "<CourseName>", group.course.course_name, 11)
+
+    p = document.paragraphs[14]
+    print(p.text, "p[14]")
+    replace_text(p, "<GroupName>", group.name, 12)
+    for run in p.runs:
+        run.bold = True
+        
+    p = document.paragraphs[15]
+    print(p.text, "p[15]")
+    replace_text(p, "<Price>", f"{group.course.price_b} руб., {group.course.price_vb}", 11)
+
+    table2 = document.tables[1]
+    
+    i = 1
+    for student_ed_kind in students_ed_kind:
+        row = table2.add_row()
+        row.cells[0].text = f"{i}."
+        row.cells[1].text = f"{student_ed_kind[0].surname} {student_ed_kind[0].name} {student_ed_kind[0].patronymic}"
+        if student_ed_kind[1] == "Внебюджет":
+            row.cells[2].text = "ВБС"
+        for cell in row.cells:
+            for run in cell.paragraphs[0].runs:
+                run.font.name = "Times New Roman"
+                run.font.size = Pt(12)
+        i += 1
+        
+    buffer = io.BytesIO()
+    document.save(buffer)
+    buffer.seek(0)
+    
+    safe_group_name = sanitize_filename(group.name) 
+    
+    response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    response['Content-Disposition'] = f'attachment; filename="expel_group_order_{safe_group_name}.docx"'
+    
+    return response

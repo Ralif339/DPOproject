@@ -1,13 +1,13 @@
 {% extends "manager_navigation.html" %}
 
-{% block title %}Добавление комиссии{% endblock title %}
+{% block title %}Редактирование комиссии{% endblock title %}
 
 {% block style %}{% endblock style %}
 
 {% block content %}
 <div class="container">
-    <h2>Добавление комиссии для группы {{group.name}}</h2>
-    <form action="{% url "commission_group_add" group.id %}" method="POST">
+    <h2>Редактирование комиссии для группы {{group.name}}</h2>
+    <form action="{% url "commission_group_edit" group.id %}" method="POST">
         {% csrf_token %}
         <div class="d-flex flex-column mb-3">
         <label for="сhairman">Председатель комиссии</label>
@@ -34,7 +34,7 @@
                 <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
             {% endfor %}
         </select>
-        <button type="submit" class='btn btn-success'>Добавить</button>
+        <button type="submit" class='btn btn-success'>Изменить</button>
     </div>
     </form>
 </div>

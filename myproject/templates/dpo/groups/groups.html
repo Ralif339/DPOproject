@@ -60,6 +60,7 @@
                 <th>ФИО преподавателя</th>
                 <th>Срок обучения</th>
                 <th>Тип курса</th>
+                <th>Статус</th>
                 <th>Действия</th>
             </tr>
         </thead>
@@ -71,6 +72,7 @@
                     <td>{{ group.teacher.surname }} {{ group.teacher.name.0 }}. {{ group.teacher.patronymic.0 }}.</td>
                     <td>{{ group.begin_date }} - {{ group.finish_date }}</td>
                     <td>{{ group.course.course_type }}</td>
+                    <td>{{ group.status }}</td>
                     <td>
                         <a class="btn btn-sm btn-warning" href="{% url "group_detail" group.id %}">⚙</a>
                         <button class="btn btn-sm btn-danger" onclick="deleteGroup()">🗑</button>

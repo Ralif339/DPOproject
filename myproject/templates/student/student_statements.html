@@ -45,11 +45,31 @@
         {% for statement in statements %}
             <div class="col">
                 <div class="card p-3 text-center">
+                    {% if statement.statement_type == "зачисление" %}
                     <h5 class="card-title">📝 Заявление на {{statement.statement_type}}</h5>
                     <p><strong>📅 Дата подачи:</strong> {{statement.submitting_date}}</p>
-                    <p><strong>🔄 Статус:</strong> {{statement.status}}</p>
                     <p><strong>🎓 Курс:</strong> {{statement.course.course_name}}</p>
-                    <p><strong>Зачислен в группу:</strong> {{statement.group.name}}</p>
+                    <p><strong>Зачислен в группу:</strong> 
+                        {% if statement.group.name %}
+                        {{statement.group.name}}
+                        {% else %}
+                        <span>-</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>🔄 Статус:</strong> {{statement.status}}</p>
+                    {% else %}
+                    <h5 class="card-title">📝 Заявление на {{statement.statement_type}}</h5>
+                    <p><strong>📅 Дата подачи:</strong> {{statement.submitting_date}}</p>
+                    <p><strong>🎓 Курс:</strong> {{statement.group.course.course_name}}</p>
+                    <p><strong>Группа:</strong> 
+                        {% if statement.group.name %}
+                            {{statement.group.name}}
+                        {% else %}
+                        <span>-</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>🔄 Статус:</strong> {{statement.status}}</p>
+                    {% endif %}
                     <div class="mt-auto">
                         {% if statement.status == "Одобрено" %}
                             <button class="btn btn-cancel w-100" disabled>Отозвать</button>

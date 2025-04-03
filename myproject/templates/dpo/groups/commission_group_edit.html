@@ -2,40 +2,79 @@
 
 {% block title %}Редактирование комиссии{% endblock title %}
 
-{% block style %}{% endblock style %}
+{% block style %}
+<style>
+    .custom-primary {
+        background-color: #9999FF !important;
+        border-color: #9999FF !important;
+    }
+    .btn-custom {
+        background-color: #9999FF;
+        border-color: #9999FF;
+        color: white;
+    }
+    .btn-custom:hover {
+        background-color: #8888EE;
+        border-color: #8888EE;
+        color: white;
+    }
+</style>
+{% endblock style %}
 
 {% block content %}
-<div class="container">
-    <h2>Редактирование комиссии для группы {{group.name}}</h2>
-    <form action="{% url "commission_group_edit" group.id %}" method="POST">
-        {% csrf_token %}
-        <div class="d-flex flex-column mb-3">
-        <label for="сhairman">Председатель комиссии</label>
-        <select class="form-select" name="сhairman" id="сhairman">
-            {% for member in members %}
-                <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
-            {% endfor %}
-        </select>
-        <label for="deputy">Заместитель председателя комиссии</label>
-        <select class="form-select" name="deputy" id="deputy">
-            {% for member in members %}
-                <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
-            {% endfor %}
-        </select>
-        <label for="secretary">Секретарь</label>
-        <select class="form-select" name="secretary" id="secretary">
-            {% for member in members %}
-                <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
-            {% endfor %}
-        </select>
-        <label for="member">Член комиссии</label>
-        <select class="form-select" name="member" id="member">
-            {% for member in members %}
-                <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
-            {% endfor %}
-        </select>
-        <button type="submit" class='btn btn-success'>Изменить</button>
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header custom-primary text-white">
+            <h2 class="h4 mb-0">Редактирование комиссии для группы {{group.name}}</h2>
+        </div>
+        <div class="card-body">
+            <form action="{% url 'commission_group_edit' group.id %}" method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="сhairman" class="form-label">Председатель комиссии</label>
+                    <select class="form-select" name="сhairman" id="сhairman" required>
+                        <option value="" selected disabled>Выберите председателя</option>
+                        {% for member in members %}
+                            <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="deputy" class="form-label">Заместитель председателя комиссии</label>
+                    <select class="form-select" name="deputy" id="deputy" required>
+                        <option value="" selected disabled>Выберите заместителя</option>
+                        {% for member in members %}
+                            <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="secretary" class="form-label">Секретарь</label>
+                    <select class="form-select" name="secretary" id="secretary" required>
+                        <option value="" selected disabled>Выберите секретаря</option>
+                        {% for member in members %}
+                            <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="member" class="form-label">Член комиссии</label>
+                    <select class="form-select" name="member" id="member" required>
+                        <option value="" selected disabled>Выберите члена комиссии</option>
+                        {% for member in members %}
+                            <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success btn-lg">Сохранить изменения</button>
+                </div>
+            </form>
+        </div>
     </div>
-    </form>
 </div>
 {% endblock content %}

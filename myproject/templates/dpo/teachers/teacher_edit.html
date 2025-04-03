@@ -1,15 +1,179 @@
 {% extends "manager_navigation.html" %}
+{% load widget_tweaks %}
 
-{% block title %}{% endblock title %}
+{% block title %}Редактирование преподавателя{% endblock title %}
+
+{% block style %}
+<style>
+    .form-control {
+        border-radius: 8px;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        background-color: white;
+    }
+    
+    .form-control:focus {
+        border-color: #9999FF;
+        box-shadow: 0 0 0 0.25rem rgba(153, 153, 255, 0.25);
+    }
+    
+    .form-label {
+        color: #555;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    h2 {
+        font-weight: 600;
+    }
+    
+    .btn-primary {
+        background-color: #9999FF;
+        border: none;
+    }
+    
+    .btn-primary:hover {
+        background-color: #8888EE !important;
+        transform: translateY(-1px);
+        transition: all 0.2s ease;
+    }
+    
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        padding: 10px 25px;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #5a6268 !important;
+        transform: translateY(-1px);
+    }
+    
+    .form-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .btn-success {
+        background-color: #28a745;
+        border: none;
+        padding: 10px 25px;
+    }
+    
+    .btn-success:hover {
+        background-color: #218838 !important;
+        transform: translateY(-1px);
+    }
+    
+    .alert-error {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
+    }
+</style>
+{% endblock style %}
 
 {% block content %}
-<div class="container">
-    <h2>Редактирование преподавателя</h2>
-    <form action="{% url "teacher_edit" teacher.id %}" method="POST">
-        {% csrf_token %}
-        {{form.as_p}}
-        <button type="submit" class="btn btn-success">Подтвердить</button>
-    </form>
 
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header text-white" style="background-color: #9999FF; border-radius: 10px 10px 0 0;">
+                    <h2 class="mb-0 text-center">
+                        <i class="fas fa-user-edit me-2"></i> Редактирование преподавателя
+                    </h2>
+                </div>
+                
+                <div class="card-body" style="background-color: white;">
+                    {% if form.errors %}
+                        <div class="alert-error mb-4">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Пожалуйста, исправьте ошибки в форме
+                        </div>
+                    {% endif %}
+                    
+                    <form action="{% url 'teacher_edit' teacher.id %}" method="POST" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="form-section">
+                            <h5 class="mb-3" style="color: #9999FF;">
+                                <i class="fas fa-id-card me-2"></i> Личные данные
+                            </h5>
+                            
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.surname.id_for_label }}" class="form-label">Фамилия *</label>
+                                    {% render_field form.surname class="form-control" required="required" %}
+                                    <div class="invalid-feedback">Пожалуйста, укажите фамилию</div>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.name.id_for_label }}" class="form-label">Имя *</label>
+                                    {% render_field form.name class="form-control" required="required" %}
+                                    <div class="invalid-feedback">Пожалуйста, укажите имя</div>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.patronymic.id_for_label }}" class="form-label">Отчество</label>
+                                    {% render_field form.patronymic class="form-control" %}
+                                    <div class="form-text">Необязательное поле</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h5 class="mb-3" style="color: #9999FF;">
+                                <i class="fas fa-briefcase me-2"></i> Должность
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.position.id_for_label }}" class="form-label">Должность *</label>
+                                {% render_field form.position class="form-control" required="required" %}
+                                <div class="invalid-feedback">Пожалуйста, укажите должность</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Назад
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check-circle me-2"></i> Сохранить изменения
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
 {% endblock content %}

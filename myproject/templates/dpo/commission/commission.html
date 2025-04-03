@@ -17,6 +17,11 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        transition: all 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
     .btn-add {
         background-color: #28a745;
@@ -39,6 +44,21 @@
     .btn-delete:hover {
         background-color: #c82333;
     }
+    .search-container {
+        position: relative;
+    }
+    .search-icon {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        color: #999;
+    }
+    .no-results {
+        text-align: center;
+        padding: 20px;
+        color: #6c757d;
+    }
 </style>
 {% endblock style %}
 
@@ -47,36 +67,77 @@
     <h2 class="text-center mb-4">Аттестационная комиссия</h2>
 
     <!-- Поле поиска и кнопка добавления -->
-    <div class="row mb-3">
-        <div class="col-md-3">
-            <a class="btn btn-add w-100" href="{% url "commission_add" %}">Добавить члена комиссии</a>
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3 mb-md-0">
+            <a class="btn btn-add w-100" href="{% url 'commission_add' %}">
+                <i class="fas fa-plus me-2"></i>Добавить члена комиссии
+            </a>
         </div>
-        <div class="col-md-9">
-            <input type="text" class="form-control" placeholder="Поиск по ФИО">
+        <div class="col-md-9 search-container">
+            <input type="text" id="searchInput" class="form-control" placeholder="Поиск по ФИО или должности">
+            <i class="fas fa-search search-icon" style="padding-right: 10px"></i>
         </div>
-        
     </div>
 
     <!-- Карточки членов комиссии -->
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="commissionList">
-        <!-- Карточка 1 -->
-         {% for member in commission %}
-        <div class="col">
+        {% for member in commission %}
+        <div class="col member-card">
             <div class="card p-3 text-center">
-                <h5 class="card-title">{{ member.surname }} {{ member.name }} {{ member.patronymic }}</h5>
-                <p class="card-text">{{ member.position }}</p>
-                <div class="mt-auto">
-                    <a class="btn btn-edit w-100 mb-2" href="{% url "commission_edit" member.id %}">Редактировать</a>
-                    <form action="{% url "commission" %}" method="post">
+                <div class="card-body">
+                    <h5 class="card-title">{{ member.surname }} {{ member.name }} {{ member.patronymic }}</h5>
+                    <p class="card-text text-muted">{{ member.position }}</p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a class="btn btn-edit w-100 mb-2" href="{% url 'commission_edit' member.id %}">
+                        <i class="fas fa-edit me-2"></i>Редактировать
+                    </a>
+                    <form action="{% url 'commission' %}" method="post">
                         {% csrf_token %}
-                        <input type="hidden" name="member_id" value={{member.id}}>
-                        <button type="submit" class="btn btn-delete w-100">Удалить</button>
+                        <input type="hidden" name="member_id" value="{{ member.id }}">
+                        <button type="submit" class="btn btn-delete w-100">
+                            <i class="fas fa-trash-alt me-2"></i>Удалить
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+    
+    <div id="noResults" class="no-results" style="display: none;">
+        <i class="fas fa-search fa-2x mb-3"></i>
+        <h5>Члены комиссии не найдены</h5>
+        <p>Попробуйте изменить параметры поиска</p>
+    </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const memberCards = document.querySelectorAll('.member-card');
+    const noResults = document.getElementById('noResults');
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        let visibleCount = 0;
+        
+        memberCards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        if (visibleCount === 0 && searchTerm.length > 0) {
+            noResults.style.display = 'block';
+        } else {
+            noResults.style.display = 'none';
+        }
+    });
+});
+</script>
 {% endblock content %}

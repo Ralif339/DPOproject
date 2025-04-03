@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.db.models import Count, OuterRef, Subquery
 from student import forms as dpo_forms
 from .doc_generation import *
+from django.db.models import Q
 
 
 
@@ -20,10 +21,52 @@ def superuser_render(request, template: str, context=None):
         return redirect('index')
 
 
-# Create your views here.
 def students_view(request):
-    students = User.objects.all().filter(is_superuser="False")
-    return superuser_render(request, "dpo/students/students.html", context={"students": students})
+    students = User.objects.filter(is_superuser=False).prefetch_related(
+        'studentgroup_set__group'
+    )
+    
+    # Получаем параметры фильтрации из GET-запроса
+    search_query = request.GET.get('search')
+    status_filter = request.GET.get('status')
+    ed_kind_filter = request.GET.get('ed_kind')
+    birth_year_filter = request.GET.get('birth_year')
+    
+    # Применяем поиск по ФИО, СНИЛС, телефону или email
+    if search_query:
+        students = students.filter(
+            Q(surname__icontains=search_query) |
+            Q(name__icontains=search_query) |
+            Q(patronymic__icontains=search_query) |
+            Q(SNILS__icontains=search_query) |
+            Q(phone__icontains=search_query) |
+            Q(email__icontains=search_query)
+        ).distinct()
+    
+    # Применяем фильтры
+    if status_filter:
+        students = students.filter(
+            studentgroup__group__status=status_filter
+        ).distinct()
+    
+    if ed_kind_filter:
+        students = students.filter(
+            studentgroup__ed_kind=ed_kind_filter
+        ).distinct()
+    
+    if birth_year_filter:
+        students = students.filter(
+            Q(birthday__year=birth_year_filter) | 
+            Q(birthday__isnull=True)
+        ).distinct()
+    
+    context = {
+        "students": students,
+        "status_choices": set(Group.objects.values_list('status', flat=True).distinct()),
+        "ed_kind_choices": set(StudentGroup.objects.values_list('ed_kind', flat=True).distinct()),
+        "search_query": search_query,
+    }
+    return superuser_render(request, "dpo/students/students.html", context)
 
 def student_profile_view(request, student_id):
     student = User.objects.get(id=student_id)
@@ -33,21 +76,60 @@ def student_profile_view(request, student_id):
         "student_groups": student_groups,  
         "today": timezone.now().date()
     }
-    return render(request, 'dpo/students/student_profile.html', context)
+    return superuser_render(request, 'dpo/students/student_profile.html', context)
 
+
+from django.db.models import Q, Count, OuterRef
+from django.shortcuts import render
+from .models import Group, StudentExpulsion
+from django.db.models.functions import Coalesce
 
 def groups_view(request):
-    # Подзапрос для подсчета отчисленных студентов в группе
+    # Подзапрос для отчисленных студентов
     expelled_students = StudentExpulsion.objects.filter(
         group=OuterRef("id")
     ).values("group").annotate(count=Count("student")).values("count")
 
-    # Получаем группы с количеством слушателей без отчисленных
+    # Базовый запрос
     groups = Group.objects.annotate(
-        student_count=Count("studentgroup") - Subquery(expelled_students, output_field=models.IntegerField())
-    )
+        student_count=Count("studentgroup") - Coalesce(Subquery(expelled_students), 0)
+    ).select_related('course', 'teacher')
 
-    return superuser_render(request, 'dpo/groups/groups.html', context={"groups": groups})
+    # Получаем параметры фильтрации
+    search = request.GET.get('search')
+    course_type = request.GET.get('course_type')
+    teacher = request.GET.get('teacher')
+    status = request.GET.get('status')
+
+    # Применяем фильтры
+    if search:
+        groups = groups.filter(
+            Q(name__icontains=search) |
+            Q(course__course_name__icontains=search)
+        )
+
+    if course_type:
+        groups = groups.filter(course__course_type=course_type)
+
+    if teacher:
+        groups = groups.filter(teacher_id=teacher)
+
+    if status:
+        groups = groups.filter(status=status)
+
+    # Подготовка контекста
+    context = {
+        'groups': groups,
+        'teachers': Group.objects.values('teacher__id', 'teacher__surname', 'teacher__name').distinct(),
+        'course_types': Group.objects.values_list('course__course_type', flat=True).distinct(),
+        'statuses': Group.objects.values_list('status', flat=True).distinct(),
+        'current_search': search,
+        'current_course_type': course_type,
+        'current_teacher': teacher,
+        'current_status': status,
+    }
+    
+    return superuser_render(request, 'dpo/groups/groups.html', context)
 
 def group_detail_view(request, group_id):
     group = Group.objects.get(id=group_id)
@@ -96,7 +178,7 @@ def group_detail_view(request, group_id):
         "is_group_finished": is_group_finished,
         "students_ed_kind": students_ed_kind,
     }
-    return render(request, 'dpo/groups/group_detail.html', context)
+    return superuser_render(request, 'dpo/groups/group_detail.html', context)
 
 def finish_course(request, group_id):
     group = get_object_or_404(Group, id=group_id)
@@ -128,9 +210,17 @@ def finish_course(request, group_id):
 
     return redirect("group_detail", group_id=group.id)
 
+from django.template.defaulttags import register
+
+@register.filter
+def filter_group(groups, course):
+    today = timezone.now().date()
+    return [group for group in groups if group.finish_date > today and group.course.id == course.id]
 
 def statements_view(request):
     today_date = timezone.now().date()
+    
+    # Обработка POST-запросов (действия с заявлениями)
     if request.method == "POST":
         statement = Statements.objects.get(id=request.POST.get("statement_id"))
         if request.POST.get("action_type") == "recall":
@@ -149,14 +239,80 @@ def statements_view(request):
                 statement.status = "Одобрено"
                 statement.save()
             return redirect("statements")
-            
-            
-        
+    
+    # Фильтрация заявлений
     statements = Statements.objects.all()
-    groups = Group.objects.all()
-    return superuser_render(request, 'dpo/statements.html', context={"statements": statements,
-                                                                     "groups": groups,
-                                                                     "today": today_date})
+    
+    # Получаем параметры фильтрации
+    search_query = request.GET.get('search')
+    statement_type = request.GET.get('type')
+    status = request.GET.get('status')
+    course_id = request.GET.get('course')
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    
+    # Применяем фильтры
+    if search_query:
+        statements = statements.filter(
+            Q(student__surname__icontains=search_query) |
+            Q(student__name__icontains=search_query) |
+            Q(student__patronymic__icontains=search_query))
+    
+    if statement_type:
+        statements = statements.filter(statement_type=statement_type)
+    
+    if status:
+        statements = statements.filter(status=status)
+    
+    if course_id:
+        statements = statements.filter(course_id=course_id)
+    
+    if date_from:
+        try:
+            statements = statements.filter(submitting_date__gte=date_from)
+        except:
+            pass
+    
+    if date_to:
+        try:
+            statements = statements.filter(submitting_date__lte=date_to)
+        except:
+            pass
+    
+    # Подготовка данных для шаблона
+    statements_list = []
+    for statement in statements:
+        suitable_groups = []
+        has_suitable_groups = False
+        
+        if statement.status == "На рассмотрении" and statement.statement_type == "зачисление":
+            suitable_groups = Group.objects.filter(
+                finish_date__gt=today_date,
+                course=statement.course
+            )
+            has_suitable_groups = suitable_groups.exists()
+        
+        statements_list.append({
+            'statement': statement,
+            'suitable_groups': suitable_groups,
+            'has_suitable_groups': has_suitable_groups
+        })
+    
+    # Получаем данные для фильтров
+    courses = Course.objects.all()
+    
+    context = {
+        'statements': statements_list,
+        'courses': courses,
+        'current_search': search_query,
+        'current_type': statement_type,
+        'current_status': status,
+        'current_course': course_id,
+        'current_date_from': date_from,
+        'current_date_to': date_to,
+    }
+    
+    return render(request, 'dpo/statements.html', context)
 
 
 def commission_view(request):

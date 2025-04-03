@@ -163,7 +163,7 @@
                 </table>
             {% endif %}
             
-            {% if not is_group_finished %}
+            {% if not is_group_finished and has_exam_protocol %}
             <form id="finish-course-form" method="POST" action="{% url 'finish_course' group.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="student_ids" id="student-ids">
@@ -174,7 +174,9 @@
             </form>
             {% else %}
                 <div class="text-center">
-                    <button type="submit" id="remove-all" class="btn btn-warning mt-3" disabled>Завершить обучение</button>
+                    <span title="Не сформирован протокол экзамена/Группа завершила обучение">
+                        <button type="submit" id="remove-all" class="btn btn-warning mt-3" disabled>Завершить обучение</button>
+                    </span>
                 </div>
             {% endif %}
             
@@ -231,27 +233,40 @@
         });
     });
     // Обработчик нажатия на "Завершить курс"
-    document.getElementById("remove-all").addEventListener("click", function () {
+    document.getElementById("finish-course-form").addEventListener("submit", function(e) {
+        // Предотвращаем стандартную отправку формы
+        e.preventDefault();
+        
         let studentIds = [];
-        let studentRows = document.querySelectorAll("#students-list tr");
-
-        studentRows.forEach(row => {
-            let studentId = row.querySelector(".remove-student").getAttribute("data-student-id");
+        // Ищем все кнопки отчисления в таблице
+        let removeButtons = document.querySelectorAll(".remove-student");
+        
+        if (removeButtons.length === 0) {
+            alert("Нет студентов для отчисления.");
+            return;
+        }
+        
+        // Собираем ID всех студентов
+        removeButtons.forEach(button => {
+            let studentId = button.getAttribute("data-student-id");
             if (studentId) {
                 studentIds.push(studentId);
             }
         });
-
+        
         if (studentIds.length === 0) {
             alert("Нет студентов для отчисления.");
             return;
         }
-
+        
         // Записываем ID в скрытое поле формы
         document.getElementById("student-ids").value = JSON.stringify(studentIds);
-
-        // Отправляем форму
-        document.getElementById("finish-course-form").submit();
+        
+        // Подтверждение действия
+        if (confirm("Вы уверены, что хотите завершить обучение для всей группы? Все студенты будут отчислены.")) {
+            // Отправляем форму
+            this.submit();
+        }
     });
 </script>
 {% endblock content %}

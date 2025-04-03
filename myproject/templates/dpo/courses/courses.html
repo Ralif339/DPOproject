@@ -7,22 +7,30 @@
         background-color: #FFFFFF;
         color: #000000;
     }
-    .sidebar {;
+    .sidebar {
+        background: #f8f9fa;
         padding: 15px;
         border-radius: 10px;
+        border: 1px solid #eee;
     }
     .card {
         border: 1px solid #ddd;
         border-radius: 10px;
         box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-        height: 100%; /* Растягиваем карточку */
+        height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        transition: all 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
     .btn-add {
         background-color: #28a745;
         color: white;
+        border: none;
     }
     .btn-add:hover {
         background-color: #218838;
@@ -30,6 +38,7 @@
     .btn-edit {
         background-color: #ffc107;
         color: black;
+        border: none;
     }
     .btn-edit:hover {
         background-color: #e0a800;
@@ -37,9 +46,58 @@
     .btn-delete {
         background-color: #dc3545;
         color: white;
+        border: none;
     }
     .btn-delete:hover {
         background-color: #c82333;
+    }
+    .btn-filter {
+        background-color: #9999FF;
+        color: white;
+        border: none;
+    }
+    .btn-filter:hover {
+        background-color: #8888EE;
+    }
+    .btn-reset {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+    }
+    .btn-reset:hover {
+        background-color: #5a6268;
+    }
+    .filter-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    .filter-buttons .btn {
+        flex: 1;
+    }
+    .no-results {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #9999FF;
+        box-shadow: 0 0 0 0.2rem rgba(153, 153, 255, 0.25);
+    }
+    .card-icon {
+        color: #666; /* Темно-серый цвет для иконок */
+        margin-right: 8px;
+        width: 20px;
+        text-align: center;
+    }
+    .search-container {
+        position: relative;
+    }
+    .search-icon {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        color: #999;
     }
 </style>
 {% endblock style %}
@@ -53,59 +111,151 @@
     <div class="row">
         <!-- Фильтрация (слева) -->
         <div class="col-md-3">
-            <a class="btn btn-add w-100 mb-2" href="{% url "course_add" %}">Добавить курс</a>
+            <a class="btn btn-add w-100 mb-3" href="{% url 'course_add' %}">
+                <i class="fas fa-plus me-2"></i>Добавить курс
+            </a>
             <div class="sidebar">
-                <h6>Фильтрация</h6>
-                <input type="text" class="form-control mb-2" placeholder="Поиск по названию">
-                
-                <label class="mt-2">Тип курса</label>
-                <select class="form-select">
-                    <option value="">Все</option>
-                    <option value="Онлайн">Онлайн</option>
-                    <option value="Офлайн">Офлайн</option>
-                </select>
+                <form id="filterForm">
+                    <h6><i class="fas fa-filter me-2"></i>Фильтрация</h6>
+                    
+                    <!-- Поиск по названию -->
+                    <label class="form-label">Поиск по названию</label>
+                    <div class="search-container mb-3">
+                        <input type="text" id="searchInput" name="search" class="form-control" 
+                               placeholder="Введите название" value="{{ request.GET.search|default:'' }}">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                    
+                    <!-- Фильтр по типу курса -->
+                    <label class="form-label">Тип курса</label>
+                    <select id="typeFilter" name="type" class="form-select mb-3">
+                        <option value="">Все типы</option>
+                        <option value="Профессиональная переподготовка" {% if request.GET.type == "Профессиональная переподготовка" %}selected{% endif %}>
+                            Профессиональная переподготовка
+                        </option>
+                        <option value="Курсы повышения квалификации КПК" {% if request.GET.type == "Курсы повышения квалификации КПК" %}selected{% endif %}>
+                            Курсы повышения квалификации (КПК)
+                        </option>
+                        <option value="Общеобразовательные программы для детей и взрослых" {% if request.GET.type == "Общеобразовательные программы для детей и взрослых" %}selected{% endif %}>
+                            Общеобразовательные программы
+                        </option>
+                        <option value="Профессиональное обучение" {% if request.GET.type == "Профессиональное обучение" %}selected{% endif %}>
+                            Профессиональное обучение
+                        </option>
+                    </select>
 
-                <label class="mt-2">Количество часов</label>
-                <select class="form-select">
-                    <option value="">Все</option>
-                    <option value="10">10 часов</option>
-                    <option value="20">20 часов</option>
-                    <option value="30">30 часов</option>
-                </select>
-
-                
+                    <div class="filter-buttons">
+                        <button type="submit" class="btn btn-filter">
+                            <i class="fas fa-check me-2"></i>Применить
+                        </button>
+                        <a href="{% url 'courses' %}" class="btn btn-reset">
+                            <i class="fas fa-undo me-2"></i>Сбросить
+                        </a>
+                    </div>
+                </form>
             </div>
         </div>
 
         <!-- Карточки курсов -->
         <div class="col-md-9">
-            <div class="row row-cols-1 row-cols-md-3 g-4" id="coursesList">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="coursesList">
                 {% for course in courses %}
-                <!-- Карточка 1 -->
-                <div class="col">
+                <div class="col course-card" 
+                     data-name="{{ course.course_name|lower }}"
+                     data-type="{{ course.course_type }}">
                     <div class="card p-3">
-                        <div>
+                        <div class="card-body">
                             <h5 class="card-title">{{ course.course_name }}</h5>
-                            <p><strong>Тип:</strong> {{ course.course_type}}</p>
-                            <p><strong>Стоимость (бюджет):</strong> {{ course.price_b|floatformat:2|default:"0.00" }} руб.</p>
-                            <p><strong>Стоимость (внебюджет):</strong> {{ course.price_vb|floatformat:2|default:"0.00" }} руб.</p>
-                            <p><strong>Количество часов:</strong> {{ course.hours_count}} ч.</p>
+                            <p><i class="fas fa-graduation-cap card-icon"></i><strong>Тип:</strong> {{ course.course_type }}</p>
+                            <p><i class="fas fa-ruble-sign card-icon"></i><strong>Стоимость (бюджет):</strong> 
+                                {{ course.price_b|floatformat:2|default:"0.00" }} руб.</p>
+                            <p><i class="fas fa-money-bill-wave card-icon"></i><strong>Стоимость (внебюджет):</strong> 
+                                {{ course.price_vb|floatformat:2|default:"0.00" }} руб.</p>
+                            <p><i class="fas fa-clock card-icon"></i><strong>Количество часов:</strong> {{ course.hours_count }} ч.</p>
                         </div>
-                        <div class="mt-auto">
-                            <a class="btn btn-edit w-100 mb-2" href="{% url "course_edit" course.id %}">Редактировать</a>
-                            <form action="{% url "courses" %}" method="POST">
+                        <div class="card-footer bg-transparent border-0 pt-0">
+                            <a class="btn btn-edit w-100 mb-2" href="{% url 'course_edit' course.id %}">
+                                <i class="fas fa-edit me-2"></i>Редактировать
+                            </a>
+                            <form action="{% url 'courses' %}" method="POST">
                                 {% csrf_token %}
-                                <input type="hidden" name="course_id" value="{{course.id}}">
+                                <input type="hidden" name="course_id" value="{{ course.id }}">
                                 <input type="hidden" name="action" value="delete">
-                                <button class="btn btn-delete w-100" type="submit">Удалить</button>
+                                <button class="btn btn-delete w-100" type="submit">
+                                    <i class="fas fa-trash-alt me-2"></i>Удалить
+                                </button>
                             </form> 
                         </div>
                     </div>
                 </div>
                 {% endfor %}
             </div>
+            
+            <div id="noResults" class="no-results" style="display: none;">
+                <i class="fas fa-search fa-2x mb-3"></i>
+                <h5>Курсы не найдены</h5>
+                <p>Попробуйте изменить параметры поиска</p>
+            </div>
         </div>
     </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const typeFilter = document.getElementById('typeFilter');
+    const courseCards = document.querySelectorAll('.course-card');
+    const noResults = document.getElementById('noResults');
+    const filterForm = document.getElementById('filterForm');
+    
+    // Заполняем фильтры из URL параметров
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('search')) searchInput.value = urlParams.get('search');
+    if (urlParams.has('type')) typeFilter.value = urlParams.get('type');
+    
+    function filterCourses() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const typeValue = typeFilter.value;
+        let visibleCount = 0;
+        
+        courseCards.forEach(card => {
+            const name = card.dataset.name;
+            const type = card.dataset.type;
+            
+            const matchesSearch = searchTerm === '' || name.includes(searchTerm);
+            const matchesType = typeValue === '' || type === typeValue;
+            
+            if (matchesSearch && matchesType) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        if (visibleCount === 0) {
+            noResults.style.display = 'block';
+        } else {
+            noResults.style.display = 'none';
+        }
+    }
+    
+    // Применяем фильтры при изменении
+    searchInput.addEventListener('input', filterCourses);
+    typeFilter.addEventListener('change', filterCourses);
+    
+    // Применяем фильтры при загрузке
+    filterCourses();
+    
+    // Обработка отправки формы фильтрации
+    filterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const params = new URLSearchParams();
+        if (searchInput.value) params.append('search', searchInput.value);
+        if (typeFilter.value) params.append('type', typeFilter.value);
+        
+        window.location.search = params.toString();
+    });
+});
+</script>
 {% endblock content %}

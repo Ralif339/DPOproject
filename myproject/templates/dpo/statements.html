@@ -18,6 +18,7 @@
         border: 1px solid #ddd;
         border-radius: 10px;
         box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
     }
     .btn-accept {
         background-color: #28a745;
@@ -33,6 +34,94 @@
     .btn-reject:hover {
         background-color: #c82333;
     }
+    .btn-filter {
+        background-color: #9999FF;
+        color: white;
+    }
+    .btn-filter:hover {
+        background-color: #8888EE;
+    }
+    .form-control {
+        border-radius: 8px;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        background-color: white;
+    }
+    .form-control:focus {
+        border-color: #9999FF;
+        box-shadow: 0 0 0 0.25rem rgba(153, 153, 255, 0.25);
+    }
+    .form-label {
+        color: #555;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    .form-select {
+        border-radius: 8px;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        background-color: white;
+    }
+    .form-select:focus {
+        border-color: #9999FF;
+        box-shadow: 0 0 0 0.25rem rgba(153, 153, 255, 0.25);
+    }
+    .text-danger {
+        color: #dc3545;
+    }
+    .alert-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border-color: #bee5eb;
+    }
+    .icon-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .student-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    .student-icon {
+        font-size: 1.5rem;
+    }
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+    .action-buttons .btn {
+        flex: 1;
+        max-width: 200px;
+    }
+    /* Новые стили только для иконок в карточках заявлений */
+    .card .fa-user-graduate {
+        color: #9999FF; /* Серый цвет для иконки студента */
+    }
+    .card .fa-file-signature,
+    .card .fa-calendar-day,
+    .card .fa-book,
+    .card .fa-info-circle,
+    .card .fa-users,
+    .card .fa-money-bill-wave,
+    .card .fa-exclamation-circle {
+        color: #9999FF; /* Серый цвет для информационных иконок */
+    }
+    .card .fa-check,
+    .card .fa-user-plus {
+        color: white; /* Белый цвет для иконок подтверждения */
+    }
+    .card .fa-times {
+        color: white; /* Белый цвет для иконок отклонения */
+    }
+
+    /* Сохраняем фиолетовый цвет для иконок в фильтрах */
+    .sidebar .icon-label i {
+        color: #6c757d;
+    }
 </style>
 {% endblock style %}
 
@@ -44,118 +133,191 @@
         <div class="row">
             <!-- Фильтрация (слева) -->
             <div class="col-md-3">
-                <div class="sidebar">
-                    <h6>Фильтрация</h6>
-                    
-                    <!-- Поиск по ФИО -->
-                    <label class="mt-2">🔍 Поиск по ФИО</label>
-                    <input type="text" class="form-control mb-2" placeholder="Введите ФИО">
-                    
-                    <!-- Фильтр по типу заявления -->
-                    <label class="mt-2">📝 Тип заявления</label>
-                    <select class="form-select">
-                        <option value="">Все</option>
-                        <option value="Зачисление">Заявление на зачисление</option>
-                        <option value="Отчисление">Заявление на отчисление</option>
-                    </select>
-    
-                    <!-- Фильтр по дате подачи -->
-                    <label class="mt-2">📅 Дата подачи</label>
-                    <input type="date" class="form-control mb-2">
-    
-                    <!-- Фильтр по курсу -->
-                    <label class="mt-2">🎓 Курс</label>
-                    <select class="form-select">
-                        <option value="">Все</option>
-                        <option value="Frontend">Frontend-разработка</option>
-                        <option value="Backend">Backend-разработка</option>
-                        <option value="Data Science">Data Science</option>
-                    </select>
-                </div>
+                <form method="get" id="filterForm">
+                    <div class="sidebar">
+                        <h6>Фильтрация</h6>
+                        
+                        <!-- Поиск по ФИО -->
+                        <label class="form-label icon-label">
+                            <i class="fas fa-search"></i> Поиск по ФИО
+                        </label>
+                        <input type="text" name="search" class="form-control mb-3" 
+                               placeholder="Введите ФИО" value="{{ current_search|default:'' }}">
+                        
+                        <!-- Фильтр по типу заявления -->
+                        <label class="form-label icon-label">
+                            <i class="fas fa-file-alt"></i> Тип заявления
+                        </label>
+                        <select name="type" class="form-select mb-3">
+                            <option value="">Все</option>
+                            <option value="зачисление" {% if current_type == "зачисление" %}selected{% endif %}>Зачисление</option>
+                            <option value="отчисление" {% if current_type == "отчисление" %}selected{% endif %}>Отчисление</option>
+                        </select>
+        
+                        <!-- Фильтр по статусу -->
+                        <label class="form-label icon-label">
+                            <i class="fas fa-tasks"></i> Статус
+                        </label>
+                        <select name="status" class="form-select mb-3">
+                            <option value="">Все</option>
+                            <option value="На рассмотрении" {% if current_status == "На рассмотрении" %}selected{% endif %}>На рассмотрении</option>
+                            <option value="Одобрено" {% if current_status == "Одобрено" %}selected{% endif %}>Одобрено</option>
+                            <option value="Отклонено" {% if current_status == "Отклонено" %}selected{% endif %}>Отклонено</option>
+                        </select>
+        
+                        <!-- Фильтр по курсу -->
+                        <label class="form-label icon-label">
+                            <i class="fas fa-graduation-cap"></i> Курс
+                        </label>
+                        <select name="course" class="form-select mb-3">
+                            <option value="">Все</option>
+                            {% for course in courses %}
+                            <option value="{{ course.id }}" {% if current_course == course.id|stringformat:"s" %}selected{% endif %}>
+                                {{ course.course_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+        
+                        <!-- Фильтр по дате подачи -->
+                        <label class="form-label icon-label">
+                            <i class="fas fa-calendar-alt"></i> Дата подачи
+                        </label>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small">От</label>
+                                <input type="date" name="date_from" class="form-control" 
+                                       value="{{ current_date_from|default:'' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small">До</label>
+                                <input type="date" name="date_to" class="form-control" 
+                                       value="{{ current_date_to|default:'' }}">
+                            </div>
+                        </div>
+                        
+                        <!-- Кнопки фильтрации -->
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="submit" class="btn btn-filter">
+                                <i class="fas fa-filter me-2"></i> Применить
+                            </button>
+                            <a href="{% url 'statements' %}" class="btn btn-secondary">
+                                <i class="fas fa-undo me-2"></i> Сбросить
+                            </a>
+                        </div>
+                    </div>
+                </form>
             </div>
     
             <!-- Карточки заявлений -->
             <div class="col-md-9">
                 <div id="applicationsList">
-                    <!-- Карточка 1 -->
-                    {% for statement in statements %}
-                    <div class="card p-4 mb-3">
-                        <h4>👨‍🎓 <strong>{{ statement.student.surname }} {{ statement.student.name }} {{ statement.student.patronymic }}</strong></h4>
-                        <p><strong>📝 Тип заявления:</strong> {{ statement.statement_type }}</p>
-                        <p><strong>📅 Дата подачи:</strong> {{ statement.submitting_date }}</p>
-                        <p><strong>Статус:</strong> {{ statement.status }}</p>
-                        {% if statement.status == "Одобрено" and statement.statement_type == "зачисление" %}
-                        <p><strong>Группа:</strong> {{ statement.group.name }}</p>
-                        {% endif %}
-                        {% if statement.status == "На рассмотрении" %}
-                            {% if statement.statement_type == "отчисление" %}
-                                <form action="{% url "statements" %}" method="POST">
-                                    {% csrf_token %}              
-                                    <!-- Кнопки -->
-                                    <div class="mt-3 d-flex justify-content-center">
-                                        <input type="hidden" name="statement_id" value="{{statement.id}}">
-                                        <input type="hidden" name="action_type" value="submit">
-                                        <button class="btn btn-accept w-100 me-2" type="submit">Одобрить</button>
-                                    </div>
-                                </form>
-                                    
-                                <form action="{% url "statements" %}" method="POST">
-                                    {% csrf_token %}
-                                    <div class="mt-2 d-flex justify-content-center">
-                                        <input type="hidden" name="action_type" value="recall">
-                                        <input type="hidden" name="statement_id" value="{{statement.id}}">
-                                        <button class="btn btn-reject w-100 me-2 " type="submit">Отклонить</button>
-                                    </div>
-                                </form>
-                            {% else %}
-                                <form action="{% url "statements" %}" method="POST">
-                                    {% csrf_token %}
-                                    <label for="groups"><strong>Группа:</strong></label>
-                                    <select name="selected_group" id="groups">
-                                        {% with found_suitable_group=False %}
-                                            {% for group in groups %}
-                                                {% if group.finish_date|date:"Y-m-d" > today|date:"Y-m-d" and group.course.id == statement.course.id %}
-                                                    <option value="{{ group.id }}">{{ group.name }}</option>
-                                                    {% with found_suitable_group=True %}
-                                                    {% endwith %}
-                                                {% endif %}
-                                            {% endfor %}
-                                        {% endwith %}
-                                    </select>
-                                    {% if found_suitable_group == False %}
-                                    <p>Нет подходящих групп</p>
-                                    {% endif %}
-
-                                    <select name="ed_kind" id="ed_kind">
-                                        <option value="Бюджет">Бюджет</option>
-                                        <option value="Внебюджет">Внебюджет</option>
-                                    </select>
-                
-                                    <!-- Кнопки -->
-                                    <div class="mt-3 d-flex justify-content-center">
-                                        <input type="hidden" name="statement_id" value="{{statement.id}}">
-                                        <input type="hidden" name="action_type" value="submit">
-                                        <button class="btn btn-accept w-100 me-2" type="submit">Зачислить</button>
-                                    </div>
-                                </form>
-                                    
-                                <form action="{% url "statements" %}" method="POST">
-                                    {% csrf_token %}
-                                    <div class="mt-2 d-flex justify-content-center">
-                                        <input type="hidden" name="action_type" value="recall">
-                                        <input type="hidden" name="statement_id" value="{{statement.id}}">
-                                        <button class="btn btn-reject w-100 me-2 " type="submit">Отклонить</button>
-                                    </div>
-                                </form>
+                    {% for statement_data in statements %}
+                        {% with statement=statement_data.statement suitable_groups=statement_data.suitable_groups has_suitable_groups=statement_data.has_suitable_groups %}
+                        <div class="card p-4">
+                            <div class="student-info">
+                                <i class="fas fa-user-graduate student-icon"></i>
+                                <h4><strong>{{ statement.student.surname }} {{ statement.student.name }} {{ statement.student.patronymic }}</strong></h4>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p><i class="fas fa-file-signature me-2"></i> <strong>Тип:</strong> {{ statement.statement_type }}</p>
+                                    <p><i class="fas fa-calendar-day me-2"></i> <strong>Дата подачи:</strong> {{ statement.submitting_date|date:"d.m.Y" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><i class="fas fa-book me-2"></i> <strong>Курс:</strong> {{ statement.course.course_name }}</p>
+                                    <p><i class="fas fa-info-circle me-2"></i> <strong>Статус:</strong> {{ statement.status }}</p>
+                                </div>
+                            </div>
+                            
+                            {% if statement.status == "Одобрено" and statement.statement_type == "зачисление" %}
+                            <p><i class="fas fa-users me-2"></i> <strong>Группа:</strong> {{ statement.group.name }}</p>
                             {% endif %}
-                        {% endif %}
+                            
+                            {% if statement.status == "На рассмотрении" %}
+                                {% if statement.statement_type == "отчисление" %}
+                                    <!-- Форма для отчислений -->
+                                    <form action="{% url 'statements' %}" method="POST">
+                                        {% csrf_token %}
+                                        <div class="action-buttons mt-3">
+                                            <input type="hidden" name="statement_id" value="{{ statement.id }}">
+                                            <input type="hidden" name="action_type" value="submit">
+                                            <button class="btn btn-accept" type="submit">
+                                                <i class="fas fa-check me-2"></i> Одобрить
+                                            </button>
+                                            <input type="hidden" name="action_type" value="recall">
+                                            <button class="btn btn-reject" type="submit">
+                                                <i class="fas fa-times me-2"></i> Отклонить
+                                            </button>
+                                        </div>
+                                    </form>
+                                {% else %}
+                                    <!-- Форма для зачислений -->
+                                    <form action="{% url 'statements' %}" method="POST">
+                                        {% csrf_token %}
+                                        <div class="mb-3">
+                                            <label class="form-label icon-label">
+                                                <i class="fas fa-users me-2"></i> Группа
+                                            </label>
+                                            {% if has_suitable_groups %}
+                                                <select name="selected_group" class="form-select">
+                                                    {% for group in suitable_groups %}
+                                                        <option value="{{ group.id }}">{{ group.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            {% else %}
+                                                <select class="form-select" disabled>
+                                                    <option>Нет подходящих групп</option>
+                                                </select>
+                                                <p class="text-danger mt-1">
+                                                    <i class="fas fa-exclamation-circle me-2"></i> Нет доступных групп для зачисления
+                                                </p>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label icon-label">
+                                                <i class="fas fa-money-bill-wave me-2"></i> Форма обучения
+                                            </label>
+                                            <select name="ed_kind" class="form-select">
+                                                <option value="Бюджет">Бюджет</option>
+                                                <option value="Внебюджет">Внебюджет</option>
+                                            </select>
+                                        </div>
+                    
+                                        <div class="action-buttons mt-3">
+                                            <input type="hidden" name="statement_id" value="{{ statement.id }}">
+                                            <input type="hidden" name="action_type" value="submit">
+                                            <button class="btn btn-accept" type="submit" {% if not has_suitable_groups %}disabled{% endif %}>
+                                                <i class="fas fa-user-plus me-2"></i> Зачислить
+                                            </button>
+                                            <input type="hidden" name="action_type" value="recall">
+                                            <button class="btn btn-reject" type="submit">
+                                                <i class="fas fa-times me-2"></i> Отклонить
+                                            </button>
+                                        </div>
+                                    </form>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        {% endwith %}
+                    {% empty %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> Нет заявлений, соответствующих выбранным фильтрам
                     </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 
+<script>
+// Автоматическая отправка формы при изменении основных фильтров
+document.querySelectorAll('#filterForm select').forEach(select => {
+    select.addEventListener('change', function() {
+        document.getElementById('filterForm').submit();
+    });
+});
+</script>
 {% endblock content %}

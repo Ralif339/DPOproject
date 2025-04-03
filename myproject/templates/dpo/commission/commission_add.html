@@ -1,21 +1,160 @@
 {% extends "manager_navigation.html" %}
-{% load static %}
+{% load widget_tweaks %}
 
 {% block title %}Добавление члена комиссии{% endblock title %}
 
 {% block style %}
+<style>
+    .form-control {
+        border-radius: 8px;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        background-color: white;
+    }
+    
+    .form-control:focus {
+        border-color: #9999FF;
+        box-shadow: 0 0 0 0.25rem rgba(153, 153, 255, 0.25);
+    }
+    
+    .form-label {
+        color: #555;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    h2 {
+        font-weight: 600;
+    }
+    
+    .btn-primary {
+        background-color: #9999FF;
+        border: none;
+    }
+    
+    .btn-primary:hover {
+        background-color: #8888EE !important;
+        transform: translateY(-1px);
+        transition: all 0.2s ease;
+    }
+    
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        padding: 10px 25px;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #5a6268 !important;
+        transform: translateY(-1px);
+    }
+    
+    .form-section {
+        margin-bottom: 1.5rem;
+    }
 
+    .btn-success {
+        background-color: #28a745;
+        border: none;
+        padding: 10px 25px;
+    }
+    
+    .btn-success:hover {
+        background-color: #218838 !important;
+        transform: translateY(-1px);
+    }
+</style>
 {% endblock style %}
 
 {% block content %}
 
-    <div class="container">
-        <h2>Добавление члена комиссии</h2>
-        <form action="{% url "commission_add" %}" method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-success">Добавить</button>
-        </form>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header text-white" style="background-color: #9999FF; border-radius: 10px 10px 0 0;">
+                    <h2 class="mb-0 text-center">
+                        <i class="fas fa-user-plus me-2"></i> Добавление члена комиссии
+                    </h2>
+                </div>
+                
+                <div class="card-body" style="background-color: white;">
+                    <form action="{% url 'commission_add' %}" method="POST" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="form-section">
+                            <h5 class="mb-3" style="color: #9999FF;">
+                                <i class="fas fa-id-card me-2"></i> Основная информация
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.surname.id_for_label }}" class="form-label">Фамилия *</label>
+                                {{ form.surname|add_class:"form-control"|attr:"required" }}
+                                <div class="invalid-feedback">Пожалуйста, укажите фамилию</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label">Имя *</label>
+                                {{ form.name|add_class:"form-control"|attr:"required" }}
+                                <div class="invalid-feedback">Пожалуйста, укажите имя</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.patronymic.id_for_label }}" class="form-label">Отчество</label>
+                                {{ form.patronymic|add_class:"form-control" }}
+                                <div class="form-text">Необязательное поле</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h5 class="mb-3" style="color: #9999FF;">
+                                <i class="fas fa-briefcase me-2"></i> Должность
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.position.id_for_label }}" class="form-label">Должность *</label>
+                                {{ form.position|add_class:"form-control"|attr:"required" }}
+                                <div class="invalid-feedback">Пожалуйста, укажите должность</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Назад
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-plus-circle me-2"></i> Добавить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
+<script>
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
 {% endblock content %}

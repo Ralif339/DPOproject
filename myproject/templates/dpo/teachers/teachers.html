@@ -17,10 +17,16 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        transition: all 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
     .btn-add {
         background-color: #28a745;
         color: white;
+        border: none;
     }
     .btn-add:hover {
         background-color: #218838;
@@ -28,6 +34,7 @@
     .btn-edit {
         background-color: #ffc107;
         color: black;
+        border: none;
     }
     .btn-edit:hover {
         background-color: #e0a800;
@@ -35,9 +42,28 @@
     .btn-delete {
         background-color: #dc3545;
         color: white;
+        border: none;
     }
     .btn-delete:hover {
         background-color: #c82333;
+    }
+    .search-container {
+        position: relative;
+    }
+    .search-icon {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        color: #999;
+    }
+    .no-results {
+        text-align: center;
+        padding: 20px;
+        color: #6c757d;
+    }
+    .teacher-card {
+        transition: all 0.3s ease;
     }
 </style>
 {% endblock style %}
@@ -47,35 +73,81 @@
     <h2 class="text-center mb-4">Преподаватели</h2>
 
     <!-- Поле поиска и кнопка добавления -->
-    <div class="row mb-3">
-        <div class="col-md-3">
-            <a class="btn btn-add w-100" href="{% url "teacher_add" %}">Добавить преподавателя</a>
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3 mb-md-0">
+            <a class="btn btn-add w-100" href="{% url 'teacher_add' %}">
+                <i class="fas fa-plus me-2"></i>Добавить преподавателя
+            </a>
         </div>
-        <div class="col-md-9">
-            <input type="text" class="form-control" placeholder="Поиск по ФИО">
+        <div class="col-md-9 search-container">
+            <input type="text" id="searchInput" class="form-control" placeholder="Поиск по ФИО или должности">
+            <i class="fas fa-search search-icon"></i>
         </div>
-        
     </div>
 
     <!-- Карточки преподавателей -->
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="teachersList">
         {% for teacher in teachers %}
-        <div class="col">
+        <div class="col teacher-card" 
+             data-name="{{ teacher.surname|lower }} {{ teacher.name|lower }} {{ teacher.patronymic|lower }}"
+             data-position="{{ teacher.position|lower }}">
             <div class="card p-3 text-center">
-                <h5 class="card-title">{{ teacher.surname }} {{ teacher.name }} {{ teacher.patronymic }}</h5>
-                <p class="card-text">{{ teacher.position }}</p>
-                <div class="mt-auto">
-                    <a class="btn btn-edit w-100 mb-2" href="{% url "teacher_edit" teacher.id %}">Редактировать</a>
-                    <form action="{% url "teachers" %}" method="post">
+                <div class="card-body">
+                    <h5 class="card-title">{{ teacher.surname }} {{ teacher.name }} {{ teacher.patronymic }}</h5>
+                    <p class="card-text text-muted">{{ teacher.position }}</p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a class="btn btn-edit w-100 mb-2" href="{% url 'teacher_edit' teacher.id %}">
+                        <i class="fas fa-edit me-2"></i>Редактировать
+                    </a>
+                    <form action="{% url 'teachers' %}" method="post">
                         {% csrf_token %}
-                        <input type="hidden" value={{teacher.id}} name='teacher_id'>
-                        <button type="submit" class="btn btn-delete w-100">Удалить</button>
+                        <input type="hidden" value="{{ teacher.id }}" name='teacher_id'>
+                        <button type="submit" class="btn btn-delete w-100">
+                            <i class="fas fa-trash-alt me-2"></i>Удалить
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+
+    <div id="noResults" class="no-results" style="display: none;">
+        <i class="fas fa-search fa-2x mb-3"></i>
+        <h5>Преподаватели не найдены</h5>
+        <p>Попробуйте изменить параметры поиска</p>
+    </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const teacherCards = document.querySelectorAll('.teacher-card');
+    const noResults = document.getElementById('noResults');
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        let visibleCount = 0;
+        
+        teacherCards.forEach(card => {
+            const name = card.dataset.name;
+            const position = card.dataset.position;
+            
+            if (name.includes(searchTerm) || position.includes(searchTerm)) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        if (visibleCount === 0 && searchTerm.length > 0) {
+            noResults.style.display = 'block';
+        } else {
+            noResults.style.display = 'none';
+        }
+    });
+});
+</script>
 {% endblock content %}

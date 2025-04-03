@@ -3,83 +3,121 @@
 
 {% block title %}Слушатели{% endblock title %}
 
+{% block style %}
+<style>
+    .btn-apply {
+        background-color: #9999FF;
+        color: white;
+        border-color: #8888EE;
+    }
+    
+    .btn-apply:hover {
+        background-color: #8888EE;
+        color: white;
+    }
+</style>
+{% endblock style %}
+
 {% block content %}
-<div class="container">
-    <!-- Поиск -->
-    <div class="row mt-3">
-        <div class="col-2"></div>
-        <div class="col-10">
-            <input type="text" class="form-control" placeholder="Поиск по ФИО">
-        </div>
-    </div>
-
-    <div class="row mt-3">
-        <!-- Фильтрация (слева) -->
-        <div class="col-2">
-            <div class="border p-3 bg-light rounded">
-                <h6>Фильтрация</h6>
-                <label class="mt-2">Статус обучения</label>
-                <select class="form-select">
-                    <option value="">Все</option>
-                    <option value="Активный">Активный</option>
-                    <option value="Завершён">Завершён</option>
-                    <option value="Отложен">Отложен</option>
+<div class="container mt-3">
+    <!-- Форма фильтрации -->
+    <form method="get" action="{% url 'students' %}" class="mb-4">
+        <div class="row g-3">
+            <!-- Поиск по ФИО -->
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Поиск по ФИО, СНИЛС, телефону или email" 
+                       value="{{ request.GET.search }}">
+            </div>
+            
+            <!-- Фильтр по статусу -->
+            <div class="col-md-2">
+                <select name="status" class="form-select">
+                    <option value="">Все статусы</option>
+                    {% for status in status_choices %}
+                        <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>
+                            {{ status }}
+                        </option>
+                    {% endfor %}
                 </select>
-
-                <label class="mt-2">Форма обучения</label>
-                <select class="form-select">
-                    <option value="">Все</option>
-                    <option value="Онлайн">Онлайн</option>
-                    <option value="Офлайн">Офлайн</option>
+            </div>
+            
+            <!-- Фильтр по форме обучения -->
+            <div class="col-md-2">
+                <select name="ed_kind" class="form-select">
+                    <option value="">Все формы</option>
+                    {% for kind in ed_kind_choices %}
+                        <option value="{{ kind }}" {% if request.GET.ed_kind == kind %}selected{% endif %}>
+                            {{ kind }}
+                        </option>
+                    {% endfor %}
                 </select>
-
-                <label class="mt-2">Год рождения</label>
-                <input type="number" class="form-control" placeholder="Введите год" min="1900" max="2024">
+            </div>
+            
+            <!-- Фильтр по году рождения -->
+            <div class="col-md-2">
+                <input type="number" name="birth_year" class="form-control" placeholder="Год рождения"
+                       min="1900" max="{% now 'Y' %}" value="{{ request.GET.birth_year }}">
+            </div>
+            
+            <!-- Кнопки -->
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-apply">Применить</button>
+                <a href="{% url 'students' %}" class="btn btn-secondary">Сбросить</a>
             </div>
         </div>
+    </form>
 
-        <!-- Карточки слушателей -->
-        <div class="col-10">
-            {% for student in students %}
-                {% if student.name %}
-                    <div class="row align-items-center border p-3 mb-3 rounded shadow-sm">
-                        <!-- Фото -->
-                        <div class="col-md-auto">
-                            <img src="{% static 'img/logo.png' %}" width="120px" height="120px" class="rounded-circle border" alt="">
-                        </div>
-
-                        <!-- Данные студента -->
-                        <div class="col">
-                            <div class="row pt-2">
-                                <div class="col-md-auto d-flex flex-column">
-                                    <p><strong>ФИО:</strong> {{ student.surname }} {{ student.name }} {{ student.patronymic }}</p>
-                                    <p><strong>Дата рождения:</strong> {{ student.birthday }}</p>
-                                    <p><strong>СНИЛС:</strong> {{ student.SNILS }}</p>
-                                    <p><strong>Паспорт:</strong> {{ student.passport }}</p>
-                                </div>
-                                <div class="col-md-auto d-flex flex-column">
-                                    
-                                    <p><strong>Группа:</strong>
-                                    {% for group in student.group_set.all %}
-                                    {{group.name}}  
-                                    {% endfor %}
-                                    </p>
-                                    
-                                    <p><strong>Телефон:</strong> {{ student.phone }}</p>
-                                    <p><strong>Почта:</strong> {{ student.email }}</p>
-                                </div>
+    <!-- Карточки слушателей -->
+    <div class="row">
+        {% for student in students %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start">
+                            <img src="{% static 'img/logo.png' %}" width="80" height="80" 
+                                 class="rounded-circle me-3 border" alt="Фото">
+                            <div>
+                                <h5 class="card-title">{{ student.surname }} {{ student.name }} {{ student.patronymic }}</h5>
+                                <p class="card-text mb-1"><small class="text-muted">Дата рождения: {{ student.birthday|date:"d.m.Y" }}</small></p>
+                                <p class="card-text mb-1"><small>СНИЛС: {{ student.SNILS }}</small></p>
                             </div>
                         </div>
-
-                        <!-- Кнопки -->
-                        <div class="col-md-auto d-flex flex-column gap-2">
-                            <a href="{% url "student_profile" student.id %}" class="btn btn-warning text-dark">Перейти</a>
+                        
+                        <hr>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Группы:</strong></p>
+                                <ul class="list-unstyled">
+                                    {% for sg in student.studentgroup_set.all %}
+                                        <li>
+                                            {{ sg.group.name }} 
+                                            <small>({{ sg.group.status }}, {{ sg.ed_kind }})</small>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Контакты:</strong></p>
+                                <p class="mb-1"><small>Телефон: {{ student.phone }}</small></p>
+                                <p class="mb-1"><small>Почта: {{ student.email }}</small></p>
+                            </div>
                         </div>
                     </div>
-                {% endif %}
-            {% endfor %}
-        </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{% url 'student_profile' student.id %}" class="btn btn-sm btn-warning">Профиль</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <h5>Слушатели не найдены</h5>
+                    <p>Попробуйте изменить параметры поиска</p>
+                </div>
+            </div>
+        {% endfor %}
     </div>
 </div>
-
 {% endblock content %}

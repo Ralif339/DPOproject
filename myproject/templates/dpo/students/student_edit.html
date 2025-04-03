@@ -1,18 +1,151 @@
 {% extends "manager_navigation.html" %}
+{% load widget_tweaks %}
 
 {% block title %}Редактирование слушателя{% endblock title %}
 
+{% block style %}
+<style>
+    .form-control {
+        border-radius: 8px;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        background-color: white;
+    }
+    
+    .form-control:focus {
+        border-color: #9999FF;
+        box-shadow: 0 0 0 0.25rem rgba(153, 153, 255, 0.25);
+    }
+    
+    .form-label {
+        color: #555;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+        border: none;
+    }
+    
+    h2, h5 {
+        font-weight: 600;
+    }
+    
+    .btn:hover {
+        background-color: #8888EE !important;
+        transform: translateY(-1px);
+        transition: all 0.2s ease;
+    }
+</style>
+{% endblock style %}
+
 {% block content %}
 
-<div class="container">
-
-    <h2>Редактирование слушателя</h2>
-    <form action="{% url "student_edit" student.id%}" method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Подтвердить</button>
-    </form>
-
+<div class="container mt-4">
+    <div class="card border-0 shadow-lg">
+        <div class="card-header text-white" style="background-color: #9999FF; border-radius: 10px 10px 0 0;">
+            <h2 class="mb-0">
+                <i class="fas fa-user-edit me-2"></i> Редактирование слушателя
+            </h2>
+        </div>
+        
+        <div class="card-body" style="background-color: white;">
+            <form action="{% url 'student_edit' student.id %}" method="POST">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <!-- Первая колонка -->
+                    <div class="col-md-6">
+                        <!-- Личные данные -->
+                        <div class="mb-4 p-3">
+                            <h5 class="mb-3" style="color: #9999FF;">
+                                <i class="fas fa-id-card me-2"></i> Личные данные
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.surname.id_for_label }}" class="form-label">Фамилия</label>
+                                {{ form.surname|add_class:"form-control" }}
+                                <div class="form-text">Пример: Иванов</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label">Имя</label>
+                                {{ form.name|add_class:"form-control" }}
+                                <div class="form-text">Пример: Иван</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.patronymic.id_for_label }}" class="form-label">Отчество</label>
+                                {{ form.patronymic|add_class:"form-control" }}
+                                <div class="form-text">Пример: Иванович (или оставьте "Нет")</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.birthday.id_for_label }}" class="form-label">Дата рождения</label>
+                                {{ form.birthday|add_class:"form-control" }}
+                                <div class="form-text">Формат: ДД.ММ.ГГГГ (Пример: 15.05.1990)</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.citizenship.id_for_label }}" class="form-label">Гражданство</label>
+                                {{ form.citizenship|add_class:"form-control" }}
+                                <div class="form-text">Пример: Российская Федерация</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Вторая колонка -->
+                    <div class="col-md-6">
+                        <!-- Документы -->
+                        <div class="mb-4 p-3">
+                            <h5 class="mb-3" style="color: #9999FF;">
+                                <i class="fas fa-file-alt me-2"></i> Документы
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.SNILS.id_for_label }}" class="form-label">СНИЛС</label>
+                                {{ form.SNILS|add_class:"form-control" }}
+                                <div class="form-text">Формат: XXX-XXX-XXX XX (Пример: 123-456-789 01)</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.passport.id_for_label }}" class="form-label">Паспорт</label>
+                                {{ form.passport|add_class:"form-control" }}
+                                <div class="form-text">Формат: XXXX XXXXXX (Пример: 4510 123456)</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Контакты -->
+                        <div class="mb-4 p-3">
+                            <h5 class="mb-3" style="color: #9999FF;">
+                                <i class="fas fa-address-book me-2"></i> Контакты
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.phone.id_for_label }}" class="form-label">Телефон</label>
+                                {{ form.phone|add_class:"form-control" }}
+                                <div class="form-text">Формат: +7XXXYYYZZZZ (Пример: +79161234567)</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.address.id_for_label }}" class="form-label">Адрес</label>
+                                {{ form.address|add_class:"form-control" }}
+                                <div class="form-text">Пример: г. Москва, ул. Ленина, д. 10, кв. 25</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-center mt-4">
+                    <button type="submit" class="btn text-white" style="background-color: #9999FF; padding: 10px 25px;">
+                        <i class="fas fa-save me-2"></i> Сохранить изменения
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 {% endblock content %}

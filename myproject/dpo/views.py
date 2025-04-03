@@ -220,25 +220,29 @@ def filter_group(groups, course):
 def statements_view(request):
     today_date = timezone.now().date()
     
-    # Обработка POST-запросов (действия с заявлениями)
     if request.method == "POST":
-        statement = Statements.objects.get(id=request.POST.get("statement_id"))
-        if request.POST.get("action_type") == "recall":
-            statement.status = "Отклонено"
-            statement.save()
-            return redirect("statements")
-        else:
-            if request.POST.get("selected_group"):
-                group = Group.objects.get(id=request.POST.get("selected_group"))
-                ed_kind = request.POST.get("ed_kind")
-                group.student.add(statement.student, through_defaults={"date": today_date, "ed_kind": ed_kind})
-                statement.status = "Одобрено"
-                statement.group = group
-                statement.save()
+        statement_id = request.POST.get("statement_id")
+        statement = Statements.objects.get(id=statement_id)
+        
+        # Определяем какая кнопка была нажата
+        if 'approve_btn' in request.POST:  # Была нажата кнопка "Одобрить"
+            if statement.statement_type == "зачисление":
+                group_id = request.POST.get("selected_group")
+                if group_id:
+                    group = Group.objects.get(id=group_id)
+                    ed_kind = request.POST.get("ed_kind")
+                    group.student.add(statement.student, through_defaults={"date": today_date, "ed_kind": ed_kind})
+                    statement.status = "Одобрено"
+                    statement.group = group
+                    statement.save()
             elif statement.statement_type == "отчисление":
                 statement.status = "Одобрено"
                 statement.save()
-            return redirect("statements")
+        elif 'reject_btn' in request.POST:  # Была нажата кнопка "Отклонить"
+            statement.status = "Отклонено"
+            statement.save()
+        
+        return redirect("statements")
     
     # Фильтрация заявлений
     statements = Statements.objects.all()

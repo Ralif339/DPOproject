@@ -1,51 +1,227 @@
 {% extends "guest_navigation.html" %}
+{% load static %}
 
 {% block title %}Регистрация{% endblock title %}
 
+{% block style %}
+<style>
+    :root {
+        --primary-color: #6c63ff;
+        --primary-hover: #5a52e0;
+        --text-color: #2d3748;
+        --light-gray: #f8f9fa;
+        --border-radius: 12px;
+        --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+    
+    body {
+        background-color: #f5f7ff;
+        display: flex;
+        flex-direction: column;
+        min-height: 80vh;
+        margin: 0;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .logo-container {
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .logo {
+        max-height: 70px;
+        width: auto;
+    }
+    
+    .register-container {
+        width: 100%;
+        max-width: 500px;
+        padding: 20px;
+    }
+    
+    .register-card {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+        background: white;
+        width: 100%;
+    }
+    
+    .register-header {
+        background: linear-gradient(135deg, var(--primary-color), #8a85ff);
+        color: white;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .register-body {
+        padding: 2rem;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control {
+        border-radius: var(--border-radius);
+        padding: 0.75rem 1rem;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+    }
+    
+    .btn-register {
+        background-color: var(--primary-color);
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        color: white;
+    }
+    
+    .btn-register:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    .btn-login {
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        background: transparent;
+    }
+    
+    .btn-login:hover {
+        background-color: #f0f0ff;
+    }
+    
+    .invalid-feedback {
+        color: #e53e3e;
+        font-size: 0.85rem;
+    }
+    
+    .input-group-text {
+        background-color: #edf2f7;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .password-hint {
+        font-size: 0.8rem;
+        color: #718096;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock style %}
+
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow">
-                <div class="card-body p-5">
-                    <h2 class="card-title text-center mb-4">Создание аккаунта</h2>
+<div class="register-container">
+    <div class="register-card">
+        <div class="register-header">
+            <h2 class="mb-1">Создание аккаунта</h2>
+            <p class="mb-0">Заполните форму регистрации</p>
+        </div>
+        
+        <div class="register-body">
+            <form action="{% url 'register' %}" method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                {% for field in form %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">
+                        <i class="fas fa-{% if 'username' in field.name %}user{% elif 'email' in field.name %}envelope{% elif 'password' in field.name %}lock{% else %}info-circle{% endif %} me-1"></i>
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                    </label>
                     
-                    <form action="{% url 'register' %}" method="post">
-                        {% csrf_token %}
-                        
-                        {% for field in form %}
-                        <div class="mb-3">
-                            <label for="{{ field.id_for_label }}" class="form-label">
-                                {{ field.label }}
-                                {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
-                            </label>
-                            <input type="{% if 'password' in field.name %}password{% else %}text{% endif %}" 
+                    <div class="input-group">
+                        {% if 'password' in field.name %}
+                            <span class="input-group-text"><i class="fas fa-key"></i></span>
+                            <input type="password" 
                                    class="form-control {% if field.errors %}is-invalid{% endif %}" 
                                    id="{{ field.id_for_label }}" 
                                    name="{{ field.html_name }}"
                                    {% if field.value %}value="{{ field.value }}"{% endif %}
                                    {% if field.field.required %}required{% endif %}>
-                            
-                            {% if field.errors %}
-                                <div class="invalid-feedback">
-                                    {{ field.errors|join:", " }}
-                                </div>
-                            {% endif %}
-                            
-                            {% if field.help_text %}
-                                <small class="form-text text-muted">{{ field.help_text }}</small>
-                            {% endif %}
+                        {% else %}
+                            <span class="input-group-text">
+                                <i class="fas fa-{% if 'username' in field.name %}user{% elif 'email' in field.name %}envelope{% else %}info-circle{% endif %}"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control {% if field.errors %}is-invalid{% endif %}" 
+                                   id="{{ field.id_for_label }}" 
+                                   name="{{ field.html_name }}"
+                                   {% if field.value %}value="{{ field.value }}"{% endif %}
+                                   {% if field.field.required %}required{% endif %}>
+                        {% endif %}
+                    </div>
+                    
+                    {% if field.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ field.errors|join:", " }}
                         </div>
-                        {% endfor %}
-                        
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <a href="{% url 'login' %}" class="btn btn-outline-secondary me-md-2">Войти</a>
-                            <button class="btn btn-success px-4" type="submit">Далее</button>
-                        </div>
-                    </form>
+                    {% endif %}
+                    
+                    {% if field.help_text %}
+                        <small class="password-hint">{{ field.help_text }}</small>
+                    {% endif %}
                 </div>
-            </div>
+                {% endfor %}
+                
+                <div class="d-grid gap-3 mt-4">
+                    <button class="btn btn-register btn-lg" type="submit">
+                        <i class="fas fa-user-plus me-2"></i> Зарегистрироваться
+                    </button>
+                    
+                    <div class="text-center pt-3 border-top">
+                        <p class="mb-0">Уже есть аккаунт? <a href="{% url 'login' %}" class="text-decoration-none" style="color: var(--primary-color); font-weight: 500;">Войти</a></p>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+// Добавляем базовую валидацию форм
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Показать/скрыть пароль
+document.querySelectorAll('.password-toggle').forEach(function(toggle) {
+    toggle.addEventListener('click', function() {
+        const input = this.previousElementSibling;
+        const icon = this.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    });
+});
+</script>
 {% endblock content %}

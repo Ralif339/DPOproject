@@ -5,116 +5,266 @@
 
 {% block style %}
 <style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .section-title {
+        color: #555;
+        font-weight: 600;
+        border-bottom: 2px solid #9999FF;
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+    }
+    .student-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    .student-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+    .info-icon {
+        color: #9999FF;
+        width: 20px;
+        text-align: center;
+        margin-right: 10px;
+    }
+    .info-row {
+        margin-bottom: 12px;
+    }
     .btn-apply {
         background-color: #9999FF;
         color: white;
-        border-color: #8888EE;
+        border: none;
+        transition: all 0.3s ease;
     }
-    
     .btn-apply:hover {
         background-color: #8888EE;
         color: white;
+    }
+    .btn-profile {
+        background-color: #9999FF;
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-profile:hover {
+        background-color: #8888EE;
+        color: white;
+    }
+    .filter-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+    .status-badge {
+        font-weight: 500;
+        padding: 5px 10px;
+        border-radius: 20px;
+        display: inline-block;
+    }
+    .status-active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .status-graduate {
+        background-color: #e2e3e5;
+        color: #383d41;
+    }
+    .status-expelled {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    .avatar-placeholder {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9999FF;
+        font-size: 24px;
+        border: 2px solid #9999FF;
+    }
+    .group-tag {
+        display: inline-block;
+        background-color: #e9ecef;
+        border-radius: 15px;
+        padding: 3px 10px;
+        margin: 2px;
+        font-size: 0.8rem;
+    }
+    .group-tag-budget {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .group-tag-contract {
+        background-color: #fff3cd;
+        color: #856404;
     }
 </style>
 {% endblock style %}
 
 {% block content %}
-<div class="container mt-3">
+<div class="container mt-4">
+    <h2 class="section-title text-center">
+        <i class="fas fa-users me-2"></i>Слушатели
+    </h2>
+
     <!-- Форма фильтрации -->
-    <form method="get" action="{% url 'students' %}" class="mb-4">
-        <div class="row g-3">
-            <!-- Поиск по ФИО -->
-            <div class="col-md-4">
-                <input type="text" name="search" class="form-control" 
-                       placeholder="Поиск по ФИО, СНИЛС, телефону или email" 
-                       value="{{ request.GET.search }}">
+    <div class="filter-card">
+        <form method="get" action="{% url 'students' %}">
+            <div class="row g-3 align-items-end">
+                <!-- Поиск по ФИО -->
+                <div class="col-md-4">
+                    <label class="form-label">Поиск</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" name="search" class="form-control" 
+                               placeholder="ФИО, СНИЛС, телефон или email" 
+                               value="{{ request.GET.search }}">
+                    </div>
+                </div>
+                
+                <!-- Фильтр по статусу -->
+                <div class="col-md-2">
+                    <label class="form-label">Статус</label>
+                    <select name="status" class="form-select">
+                        <option value="">Все статусы</option>
+                        {% for status in status_choices %}
+                            <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>
+                                {{ status }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Фильтр по форме обучения -->
+                <div class="col-md-2">
+                    <label class="form-label">Форма обучения</label>
+                    <select name="ed_kind" class="form-select">
+                        <option value="">Все формы</option>
+                        {% for kind in ed_kind_choices %}
+                            <option value="{{ kind }}" {% if request.GET.ed_kind == kind %}selected{% endif %}>
+                                {{ kind }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Фильтр по году рождения -->
+                <div class="col-md-2">
+                    <label class="form-label">Год рождения</label>
+                    <input type="number" name="birth_year" class="form-control" placeholder="Год"
+                           min="1900" max="{% now 'Y' %}" value="{{ request.GET.birth_year }}">
+                </div>
+                
+                <!-- Кнопки -->
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-apply w-100">
+                        <i class="fas fa-filter me-2"></i> Применить
+                    </button>
+                    <a href="{% url 'students' %}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-undo me-2"></i> Сбросить
+                    </a>
+                </div>
             </div>
-            
-            <!-- Фильтр по статусу -->
-            <div class="col-md-2">
-                <select name="status" class="form-select">
-                    <option value="">Все статусы</option>
-                    {% for status in status_choices %}
-                        <option value="{{ status }}" {% if request.GET.status == status %}selected{% endif %}>
-                            {{ status }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <!-- Фильтр по форме обучения -->
-            <div class="col-md-2">
-                <select name="ed_kind" class="form-select">
-                    <option value="">Все формы</option>
-                    {% for kind in ed_kind_choices %}
-                        <option value="{{ kind }}" {% if request.GET.ed_kind == kind %}selected{% endif %}>
-                            {{ kind }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <!-- Фильтр по году рождения -->
-            <div class="col-md-2">
-                <input type="number" name="birth_year" class="form-control" placeholder="Год рождения"
-                       min="1900" max="{% now 'Y' %}" value="{{ request.GET.birth_year }}">
-            </div>
-            
-            <!-- Кнопки -->
-            <div class="col-md-2 d-flex gap-2">
-                <button type="submit" class="btn btn-apply">Применить</button>
-                <a href="{% url 'students' %}" class="btn btn-secondary">Сбросить</a>
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
 
     <!-- Карточки слушателей -->
-    <div class="row">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for student in students %}
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
+            <div class="col">
+                <div class="card student-card p-3">
                     <div class="card-body">
-                        <div class="d-flex align-items-start">
-                            <img src="{% static 'img/logo.png' %}" width="80" height="80" 
-                                 class="rounded-circle me-3 border" alt="Фото">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="avatar-container me-3">
+                                {% if student.photo %}
+                                    <img src="{{ student.photo.url }}" class="avatar-img" alt="Фото слушателя">
+                                {% else %}
+                                    <div class="avatar-placeholder">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
                             <div>
-                                <h5 class="card-title">{{ student.surname }} {{ student.name }} {{ student.patronymic }}</h5>
-                                <p class="card-text mb-1"><small class="text-muted">Дата рождения: {{ student.birthday|date:"d.m.Y" }}</small></p>
-                                <p class="card-text mb-1"><small>СНИЛС: {{ student.SNILS }}</small></p>
+                                <h5 class="card-title mb-1">{{ student.surname }} {{ student.name }} {{ student.patronymic }}</h5>
+                                <p class="card-text text-muted mb-1">
+                                    <small>
+                                        <i class="fas fa-birthday-cake me-1"></i>
+                                        {{ student.birthday|date:"d.m.Y" }} ({{ student.age }} лет)
+                                    </small>
+                                </p>
+                                <p class="card-text mb-1">
+                                    <small>
+                                        <i class="fas fa-id-card me-1"></i>
+                                        {{ student.SNILS|default:"-" }}
+                                    </small>
+                                </p>
                             </div>
                         </div>
                         
-                        <hr>
+                        <hr class="my-2">
                         
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p class="mb-1"><strong>Группы:</strong></p>
-                                <ul class="list-unstyled">
-                                    {% for sg in student.studentgroup_set.all %}
-                                        <li>
-                                            {{ sg.group.name }} 
-                                            <small>({{ sg.group.status }}, {{ sg.ed_kind }})</small>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <p class="mb-1"><strong>Контакты:</strong></p>
-                                <p class="mb-1"><small>Телефон: {{ student.phone }}</small></p>
-                                <p class="mb-1"><small>Почта: {{ student.email }}</small></p>
-                            </div>
+                        <!-- Группы -->
+                        <div class="mb-3">
+                            <h6 class="mb-2">
+                                <i class="fas fa-users info-icon"></i>
+                                <strong>Группы:</strong>
+                            </h6>
+                            {% if student.studentgroup_set.all %}
+                                {% for sg in student.studentgroup_set.all %}
+                                    <span class="group-tag {% if sg.ed_kind == 'Бюджет' %}group-tag-budget{% else %}group-tag-contract{% endif %}">
+                                        {{ sg.group.name }}
+                                        <small>({{ sg.group.status }})</small>
+                                    </span>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted mb-0"><small>Не состоит в группах</small></p>
+                            {% endif %}
                         </div>
+                        
+                        <!-- Контакты -->
+                        <div class="mb-3">
+                            <h6 class="mb-2">
+                                <i class="fas fa-address-book info-icon"></i>
+                                <strong>Контакты:</strong>
+                            </h6>
+                            <p class="mb-1">
+                                <small>
+                                    <i class="fas fa-phone me-1"></i>
+                                    {{ student.phone|default:"-" }}
+                                </small>
+                            </p>
+                            <p class="mb-0">
+                                <small>
+                                    <i class="fas fa-envelope me-1"></i>
+                                    {{ student.email|default:"-" }}
+                                </small>
+                            </p>
+                        </div>
+
                     </div>
-                    <div class="card-footer bg-transparent">
-                        <a href="{% url 'student_profile' student.id %}" class="btn btn-sm btn-warning">Профиль</a>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <a href="{% url 'student_profile' student.id %}" class="btn btn-profile w-100">
+                            <i class="fas fa-user-edit me-2"></i> Профиль
+                        </a>
                     </div>
                 </div>
             </div>
         {% empty %}
             <div class="col-12">
-                <div class="alert alert-info text-center">
-                    <h5>Слушатели не найдены</h5>
-                    <p>Попробуйте изменить параметры поиска</p>
+                <div class="alert alert-info text-center py-4">
+                    <i class="fas fa-info-circle fa-2x mb-3" style="color: #9999FF;"></i>
+                    <h4>Слушатели не найдены</h4>
+                    <p class="mb-0">Попробуйте изменить параметры поиска</p>
                 </div>
             </div>
         {% endfor %}

@@ -5,17 +5,57 @@
 
 {% block style %}
 <style>
-    .card {
-        border: 1px solid #ddd;
+    body {
+        background-color: #f8f9fa;
+    }
+    .profile-card {
+        border: none;
         border-radius: 10px;
-        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .course-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     }
     .btn-edit {
-        background-color: #ffc107;
-        color: black;
+        background-color: #9999FF;
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
     }
     .btn-edit:hover {
-        background-color: #e0a800;
+        background-color: #8888EE;
+        color: white;
+    }
+    .profile-img {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border: 3px solid #9999FF;
+    }
+    .info-icon {
+        color: #9999FF;
+        width: 20px;
+        text-align: center;
+        margin-right: 10px;
+    }
+    .section-title {
+        color: #555;
+        font-weight: 600;
+        border-bottom: 2px solid #9999FF;
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+    }
+    .info-row {
+        margin-bottom: 12px;
     }
 </style>
 {% endblock style %}
@@ -25,46 +65,104 @@
     <h2 class="text-center mb-4">Профиль слушателя</h2>
 
     <!-- Основная информация о слушателе -->
-    <div class="card p-4 mb-4">
-        <div class="row">
+    <div class="card profile-card p-4 mb-5">
+        <div class="row align-items-center">
             <div class="col-md-3 text-center">
-                <img src="{% static "img/logo.png" %}" width="200px" class="rounded-circle border" alt="Фото">
+                <img src="{% static 'img/logo.png' %}" class="rounded-circle profile-img" alt="Фото профиля">
             </div>
             <div class="col-md-9">
+                <h3 class="mb-4">{{ user.surname }} {{ user.name }} {{ user.patronymic }}</h3>
+                
                 <div class="row">
-                    <h4>{{ user.surname }} {{ user.name }} {{ user.patronymic }}</h4>
-                    <div class="col">
-                        <p><strong>📧 Почта:</strong> {{ user.email }}</p>
-                        <p><strong>📅 Дата рождения:</strong> {{ user.birthday }}</p>
-                        <p><strong>🔢 СНИЛС:</strong> {{ user.SNILS }}</p>
-                        <p><strong>🆔 Паспорт:</strong> {{ user.passport }}</p>
+                    <div class="col-md-6">
+                        <div class="info-row">
+                            <i class="fas fa-envelope info-icon"></i>
+                            <strong>Почта:</strong> {{ user.email }}
+                        </div>
+                        <div class="info-row">
+                            <i class="fas fa-birthday-cake info-icon"></i>
+                            <strong>Дата рождения:</strong> {{ user.birthday }}
+                        </div>
+                        <div class="info-row">
+                            <i class="fas fa-id-card info-icon"></i>
+                            <strong>СНИЛС:</strong> {{ user.SNILS }}
+                        </div>
+                        <div class="info-row">
+                            <i class="fas fa-passport info-icon"></i>
+                            <strong>Паспорт:</strong> {{ user.passport }}
+                        </div>
                     </div>
-                    <div class="col">
-                        <p><strong>📞 Телефон:</strong> {{ user.phone }}</p>
-                        <p><strong>Гражданство:</strong> {{ user.citizenship }}</p>
-                        <p><strong>Адрес проживания:</strong> {{ user.address }}</p>
+                    <div class="col-md-6">
+                        <div class="info-row">
+                            <i class="fas fa-phone info-icon"></i>
+                            <strong>Телефон:</strong> {{ user.phone }}
+                        </div>
+                        <div class="info-row">
+                            <i class="fas fa-globe-europe info-icon"></i>
+                            <strong>Гражданство:</strong> {{ user.citizenship }}
+                        </div>
+                        <div class="info-row">
+                            <i class="fas fa-home info-icon"></i>
+                            <strong>Адрес проживания:</strong> {{ user.address }}
+                        </div>
                     </div>
                 </div>
-                <a href="{% url "update_info" %}" class="btn btn-edit mt-3 w-100">Изменить данные</a>
+                
+                <div class="mt-4">
+                    <a href="{% url 'update_info' %}" class="btn btn-edit">
+                        <i class="fas fa-user-edit me-2"></i>Изменить данные
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
-    <h4 class="mb-3">Курсы</h4>
+    <h4 class="section-title mb-4">
+        <i class="fas fa-book-open me-2"></i>Мои курсы
+    </h4>
+    
+    {% if groups %}
     <div class="row row-cols-1 row-cols-md-2 g-4">
         {% for group in groups %}
         <div class="col">
-            <div class="card p-3">
-                <h5 class="card-title">{{group.course.course_name}}</h5>
-                <p><strong> Группа:</strong> {{group.name}} </p>
-                <p><strong>📅 Срок обучения:</strong> {{group.begin_date}} - {{group.finish_date}}</p>
-                <p><strong>👨‍🏫 Преподаватель:</strong> {{group.teacher.surname}} {{group.teacher.name.0}}. {{group.teacher.patronymic.0}}.</p>
-                <p><strong>📌 Статус:</strong> {{group.status}}</p>
+            <div class="card course-card p-4">
+                <h5 class="card-title mb-3">{{ group.course.course_name }}</h5>
+                
+                <div class="info-row">
+                    <i class="fas fa-users info-icon"></i>
+                    <strong>Группа:</strong> {{ group.name }}
+                </div>
+                
+                <div class="info-row">
+                    <i class="fas fa-calendar-alt info-icon"></i>
+                    <strong>Срок обучения:</strong> 
+                    {{ group.begin_date|date:"d.m.Y" }} - {{ group.finish_date|date:"d.m.Y" }}
+                </div>
+                
+                <div class="info-row">
+                    <i class="fas fa-chalkboard-teacher info-icon"></i>
+                    <strong>Преподаватель:</strong> 
+                    {{ group.teacher.surname }} {{ group.teacher.name.0 }}. {{ group.teacher.patronymic.0 }}.
+                </div>
+                
+                <div class="info-row">
+                    <i class="fas fa-info-circle info-icon"></i>
+                    <strong>Статус:</strong> 
+                    <span class="badge 
+                        {% if group.status == 'Активный' %}bg-success
+                        {% elif group.status == 'Завершен' %}bg-secondary
+                        {% else %}bg-warning text-dark{% endif %}">
+                        {{ group.status }}
+                    </span>
+                </div>
             </div>
         </div>
         {% endfor %}
     </div>
-    <p></p>
-    <p></p>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>Вы пока не записаны ни на один курс
+    </div>
+    {% endif %}
 </div>
 {% endblock content %}

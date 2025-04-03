@@ -1,14 +1,44 @@
 {% extends "student_navigation.html" %}
+{% load static %}
 
 {% block title %}Подача заявления{% endblock title %}
 
 {% block style %}
 <style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .section-title {
+        color: #555;
+        font-weight: 600;
+        border-bottom: 2px solid #9999FF;
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+    }
+    .statement-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    .statement-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+    .info-icon {
+        color: #9999FF;
+        width: 20px;
+        text-align: center;
+        margin-right: 10px;
+    }
+    .info-row {
+        margin-bottom: 12px;
+    }
     /* Скрываем стандартные радио-кнопки */
     input[type="radio"] {
         display: none;
     }
-
     /* Стилизация label как кнопки */
     .toggle-btn {
         display: inline-block;
@@ -18,68 +48,104 @@
         border-radius: 5px;
         cursor: pointer;
         transition: 0.3s;
+        margin: 0 5px;
     }
-
     /* Подсвечиваем активную кнопку */
     input[type="radio"]:checked + label {
         background-color: #9999FF;
         color: white;
     }
-
-    /* Стили для сообщений */
-    .no-courses-message {
+    .btn-submit {
+        background-color: #9999FF;
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-submit:hover {
+        background-color: #8888EE;
+    }
+    .no-data-message {
         text-align: center;
         margin-top: 20px;
         font-size: 18px;
         color: #666;
         width: 100%;
+        padding: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 </style>
 {% endblock style %}
 
 {% block content %}
+<div class="container mt-4">
+    <h2 class="section-title text-center">
+        <i class="fas fa-file-upload me-2"></i>Подача заявления
+    </h2>
 
-<div class="container text-center mt-5">
-    <h2 class="mb-4">Подача заявления</h2>
+    <div class="text-center mb-5">
+        <!-- Радиокнопки -->
+        <input type="radio" id="enroll" name="action" checked>
+        <label for="enroll" class="toggle-btn">
+            <i class="fas fa-user-plus me-2"></i>Зачисление
+        </label>
 
-    <!-- Радиокнопки -->
-    <input type="radio" id="enroll" name="action" checked>
-    <label for="enroll" class="toggle-btn">Зачисление</label>
+        <input type="radio" id="expel" name="action">
+        <label for="expel" class="toggle-btn">
+            <i class="fas fa-user-minus me-2"></i>Отчисление
+        </label>
+    </div>
 
-    <input type="radio" id="expel" name="action">
-    <label for="expel" class="toggle-btn">Отчисление</label>
-</div>
-
-<div class="container mt-5">
-    <div class="col-md-9">
-        <div class="row row-cols-1 row-cols-md-3 g-4" id="coursesList">
-            {% for course in courses %}
-            <div class="col">
-                <div class="card p-3">
-                    <div>
-                        <h5 class="card-title">{{ course.course_name }}</h5>
-                        <p><strong>Тип:</strong> {{ course.course_type}}</p>
-                        <p><strong>Стоимость:</strong> {{ course.price|floatformat:2|default:"0.00" }} руб.</p>
-                        <p><strong>Количество часов:</strong> {{ course.hours_count}} ч.</p>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="coursesList">
+        {% for course in courses %}
+        <div class="col">
+            <div class="card statement-card p-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-book info-icon"></i>
+                        {{ course.course_name }}
+                    </h5>
+                    
+                    <div class="info-row">
+                        <i class="fas fa-tag info-icon"></i>
+                        <strong>Тип:</strong> {{ course.course_type}}
                     </div>
-                    <div class="mt-auto">
-                        <form action="{% url "new_statement" %}" method="POST">
-                            {% csrf_token %}
-                            <input type="hidden" name="course_id" value="{{ course.id }}">
-                            <button style="background: #9999FF; border: #9999FF" class="btn btn-primary w-100 mb-2">Выбрать</button>
-                        </form>
+                    
+                    <div class="info-row">
+                        <i class="fas fa-money-bill-wave info-icon"></i>
+                        <strong>Стоимость:</strong> {{ course.price|floatformat:2|default:"0.00" }} руб.
+                    </div>
+                    
+                    <div class="info-row">
+                        <i class="fas fa-clock info-icon"></i>
+                        <strong>Количество часов:</strong> {{ course.hours_count}} ч.
                     </div>
                 </div>
+                
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <form action="{% url "new_statement" %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="course_id" value="{{ course.id }}">
+                        <button class="btn btn-submit w-100">
+                            <i class="fas fa-check-circle me-2"></i>Выбрать
+                        </button>
+                    </form>
+                </div>
             </div>
-            {% endfor %}
         </div>
-        <!-- Сообщение, если нет курсов -->
-        <div id="noCoursesMessage" class="no-courses-message" style="display: none;">
-            Нет доступных курсов для зачисления
-        </div>
-        <div id="noGroupsMessage" class="no-courses-message" style="display: none;">
-            Вы не обучаетесь ни на одном курсе
-        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Сообщения, если нет данных -->
+    <div id="noCoursesMessage" class="no-data-message" style="display: none;">
+        <i class="fas fa-info-circle fa-2x mb-3" style="color: #9999FF;"></i>
+        <h4>Нет доступных курсов для зачисления</h4>
+    </div>
+    
+    <div id="noGroupsMessage" class="no-data-message" style="display: none;">
+        <i class="fas fa-info-circle fa-2x mb-3" style="color: #9999FF;"></i>
+        <h4>Вы не обучаетесь ни на одном курсе</h4>
     </div>
 </div>
 
@@ -106,19 +172,41 @@
                             data.courses.forEach(course => {
                                 const courseCard = `
                                     <div class="col">
-                                        <div class="card p-3">
-                                            <div>
-                                                <h5 class="card-title">${course.course_name}</h5>
-                                                <p><strong>Тип:</strong> ${course.course_type}</p>
-                                                <p><strong>Стоимость (бюджет):</strong> ${course.price_b} руб.</p>
-                                                <p><strong>Стоимость (внебюджет):</strong> ${course.price_vb} руб.</p>
-                                                <p><strong>Количество часов:</strong> ${course.hours_count} ч.</p>
+                                        <div class="card statement-card p-4">
+                                            <div class="card-body">
+                                                <h5 class="card-title mb-3">
+                                                    <i class="fas fa-book info-icon"></i>
+                                                    ${course.course_name}
+                                                </h5>
+                                                
+                                                <div class="info-row">
+                                                    <i class="fas fa-tag info-icon"></i>
+                                                    <strong>Тип:</strong> ${course.course_type}
+                                                </div>
+                                                
+                                                <div class="info-row">
+                                                    <i class="fas fa-money-bill-wave info-icon"></i>
+                                                    <strong>Стоимость (бюджет):</strong> ${course.price_b} руб.
+                                                </div>
+                                                
+                                                <div class="info-row">
+                                                    <i class="fas fa-money-bill-wave info-icon"></i>
+                                                    <strong>Стоимость (внебюджет):</strong> ${course.price_vb} руб.
+                                                </div>
+                                                
+                                                <div class="info-row">
+                                                    <i class="fas fa-clock info-icon"></i>
+                                                    <strong>Количество часов:</strong> ${course.hours_count} ч.
+                                                </div>
                                             </div>
-                                            <div class="mt-auto">
+                                            
+                                            <div class="card-footer bg-transparent border-0 pt-0">
                                                 <form action="{% url "new_statement" %}" method="POST">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="course_id" value="${course.id}">
-                                                    <button style="background: #9999FF; border: #9999FF" class="btn btn-primary w-100 mb-2">Выбрать</button>
+                                                    <button class="btn btn-submit w-100">
+                                                        <i class="fas fa-check-circle me-2"></i>Выбрать
+                                                    </button>
                                                 </form>
                                             </div>
                                         </div>
@@ -134,18 +222,36 @@
                             data.courses.forEach(group => {
                                 const groupCard = `
                                     <div class="col">
-                                        <div class="card p-3">
-                                            <div>
-                                                <h5 class="card-title">${group.group_name}</h5>
-                                                <p><strong>Курс:</strong> ${group.course_name}</p>
-                                                <p><strong>Дата начала:</strong> ${group.begin_date}</p>
-                                                <p><strong>Дата окончания:</strong> ${group.finish_date}</p>
+                                        <div class="card statement-card p-4">
+                                            <div class="card-body">
+                                                <h5 class="card-title mb-3">
+                                                    <i class="fas fa-users info-icon"></i>
+                                                    ${group.group_name}
+                                                </h5>
+                                                
+                                                <div class="info-row">
+                                                    <i class="fas fa-book info-icon"></i>
+                                                    <strong>Курс:</strong> ${group.course_name}
+                                                </div>
+                                                
+                                                <div class="info-row">
+                                                    <i class="fas fa-calendar-day info-icon"></i>
+                                                    <strong>Дата начала:</strong> ${group.begin_date}
+                                                </div>
+                                                
+                                                <div class="info-row">
+                                                    <i class="fas fa-calendar-day info-icon"></i>
+                                                    <strong>Дата окончания:</strong> ${group.finish_date}
+                                                </div>
                                             </div>
-                                            <div class="mt-auto">
+                                            
+                                            <div class="card-footer bg-transparent border-0 pt-0">
                                                 <form action="{% url "new_statement" %}" method="POST">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="group_id" value="${group.id}">
-                                                    <button style="background: #9999FF; border: #9999FF" class="btn btn-primary w-100 mb-2">Выбрать</button>
+                                                    <button class="btn btn-submit w-100">
+                                                        <i class="fas fa-check-circle me-2"></i>Выбрать
+                                                    </button>
                                                 </form>
                                             </div>
                                         </div>

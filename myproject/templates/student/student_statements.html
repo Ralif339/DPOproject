@@ -1,92 +1,152 @@
 {% extends "student_navigation.html" %}
+{% load static %}
 
 {% block title %}Мои заявления{% endblock title %}
 
 {% block style %}
 <style>
     body {
-        background-color: #FFFFFF;
-        color: #000000;
+        background-color: #f8f9fa;
     }
-    .card {
-        border: 1px solid #ddd;
+    .statement-card {
+        border: none;
         border-radius: 10px;
-        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
         height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
     }
-    .btn-add {
-        background-color: #28a745;
-        color: white;
-    }
-    .btn-add:hover {
-        background-color: #218838;
+    .statement-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     }
     .btn-cancel {
         background-color: #dc3545;
         color: white;
+        border: none;
+        transition: all 0.3s ease;
     }
     .btn-cancel:hover {
         background-color: #c82333;
+    }
+    .btn-cancel:disabled {
+        opacity: 0.65;
+    }
+    .info-icon {
+        color: #9999FF;
+        width: 20px;
+        text-align: center;
+        margin-right: 10px;
+    }
+    .section-title {
+        color: #555;
+        font-weight: 600;
+        border-bottom: 2px solid #9999FF;
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+    }
+    .info-row {
+        margin-bottom: 12px;
+    }
+    .status-badge {
+        font-weight: 500;
+        padding: 5px 10px;
+        border-radius: 20px;
+    }
+    .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    .status-approved {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .status-rejected {
+        background-color: #f8d7da;
+        color: #721c24;
     }
 </style>
 {% endblock style %}
 
 {% block content %}
-
 <div class="container mt-4">
-    <h2 class="text-center mb-4">Мои заявления</h2>
+    <h2 class="section-title text-center">
+        <i class="fas fa-file-alt me-2"></i>Мои заявления
+    </h2>
 
-    <!-- Карточки заявлений -->
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        <!-- Карточка 1 -->
         {% for statement in statements %}
-            <div class="col">
-                <div class="card p-3 text-center">
+        <div class="col">
+            <div class="card statement-card p-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-file-signature info-icon"></i>
+                        Заявление на {{ statement.statement_type }}
+                    </h5>
+                    
+                    <div class="info-row">
+                        <i class="fas fa-calendar-day info-icon"></i>
+                        <strong>Дата подачи:</strong> {{ statement.submitting_date|date:"d.m.Y" }}
+                    </div>
+                    
                     {% if statement.statement_type == "зачисление" %}
-                    <h5 class="card-title">📝 Заявление на {{statement.statement_type}}</h5>
-                    <p><strong>📅 Дата подачи:</strong> {{statement.submitting_date}}</p>
-                    <p><strong>🎓 Курс:</strong> {{statement.course.course_name}}</p>
-                    <p><strong>Зачислен в группу:</strong> 
-                        {% if statement.group.name %}
-                        {{statement.group.name}}
-                        {% else %}
-                        <span>-</span>
-                        {% endif %}
-                    </p>
-                    <p><strong>🔄 Статус:</strong> {{statement.status}}</p>
+                        <div class="info-row">
+                            <i class="fas fa-book info-icon"></i>
+                            <strong>Курс:</strong> {{ statement.course.course_name }}
+                        </div>
                     {% else %}
-                    <h5 class="card-title">📝 Заявление на {{statement.statement_type}}</h5>
-                    <p><strong>📅 Дата подачи:</strong> {{statement.submitting_date}}</p>
-                    <p><strong>🎓 Курс:</strong> {{statement.group.course.course_name}}</p>
-                    <p><strong>Группа:</strong> 
-                        {% if statement.group.name %}
-                            {{statement.group.name}}
-                        {% else %}
-                        <span>-</span>
-                        {% endif %}
-                    </p>
-                    <p><strong>🔄 Статус:</strong> {{statement.status}}</p>
+                        <div class="info-row">
+                            <i class="fas fa-book info-icon"></i>
+                            <strong>Курс:</strong> {{ statement.group.course.course_name }}
+                        </div>
                     {% endif %}
-                    <div class="mt-auto">
-                        {% if statement.status == "Одобрено" %}
-                            <button class="btn btn-cancel w-100" disabled>Отозвать</button>
-                        {% elif statement.status == "Отклонено" %}
-                            <button class="btn btn-cancel w-100" disabled>Отозвать</button>
+                    
+                    <div class="info-row">
+                        <i class="fas fa-users info-icon"></i>
+                        <strong>Группа:</strong> 
+                        {% if statement.group.name %}
+                            {{ statement.group.name }}
                         {% else %}
-                        <form action="{% url "student_statements" %}" method="POST">
-                            {% csrf_token %}
-                            <input type="hidden" name="statement_id" value="{{statement.id}}">
-                            <button class="btn btn-cancel w-100">Отозвать</button>
-                        </form>
+                            <span class="text-muted">Не назначена</span>
                         {% endif %}
                     </div>
+                    
+                    <div class="info-row">
+                        <i class="fas fa-info-circle info-icon"></i>
+                        <strong>Статус:</strong> 
+                        <span class="status-badge 
+                            {% if statement.status == 'На рассмотрении' %}status-pending
+                            {% elif statement.status == 'Одобрено' %}status-approved
+                            {% else %}status-rejected{% endif %}">
+                            {{ statement.status }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    {% if statement.status == "На рассмотрении" %}
+                    <form action="{% url 'student_statements' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="statement_id" value="{{ statement.id }}">
+                        <button class="btn btn-cancel w-100">
+                            <i class="fas fa-times-circle me-2"></i>Отозвать
+                        </button>
+                    </form>
+                    {% else %}
+                    <button class="btn btn-cancel w-100" disabled>
+                        <i class="fas fa-times-circle me-2"></i>Отозвать
+                    </button>
+                    {% endif %}
                 </div>
             </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle me-2"></i>
+                У вас нет активных заявлений
+            </div>
+        </div>
         {% endfor %}
     </div>
 </div>
-
 {% endblock content %}

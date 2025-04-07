@@ -1,216 +1,360 @@
 {% extends "manager_navigation.html" %}
+{% load static %}
 
-{% block title %}Группа{% endblock title %}
+{% block title %}Группа {{group.name}}{% endblock title %}
 
 {% block style %}
 <style>
-    .btn-primary {
-        background: #9999FF;
-        border: #9999FF;
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
     }
-
-    .btn-primary:hover {
-        background:rgb(128, 128, 249);
-        border: rgb(128, 128, 249);
+    
+    .card-header-custom {
+        background-color: #9999FF;
+        color: white;
+        border-radius: 10px 10px 0 0;
+        padding: 1.5rem;
     }
-    .btn-edit {
+    
+    .btn-primary-custom {
+        background-color: #9999FF;
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary-custom:hover {
+        background-color: #8888EE;
+        color: white;
+        transform: translateY(-1px);
+    }
+    
+    .btn-primary-custom:disabled {
+        background-color: #9999FF;
+        opacity: 0.65;
+    }
+    
+    .btn-warning-custom {
         background-color: #ffc107;
         color: black;
+        transition: all 0.3s ease;
     }
-    .btn-edit:hover {
+    
+    .btn-warning-custom:hover {
         background-color: #e0a800;
+        color: black;
     }
-    /* Стили для отключенных кнопок */
-    .btn-primary:disabled {
-        background-color: #9999FF; /* Серый фон */
-        color: white; /* Темно-серый текст */
+    
+    .btn-danger-custom {
+        transition: all 0.3s ease;
+    }
+    
+    .btn-danger-custom:hover {
+        transform: translateY(-1px);
+    }
+    
+    .table-custom {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .table-custom thead {
+        background-color: #9999FF;
+        color: white;
+    }
+    
+    .section-title {
+        color: #555;
+        font-weight: 600;
+        border-bottom: 2px solid #9999FF;
+        padding-bottom: 8px;
+        margin: 1.5rem 0 1rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .commission-member {
+        padding: 0.75rem;
+        border-left: 3px solid #9999FF;
+        margin-bottom: 0.5rem;
+        background-color: #f8f9fa;
+        border-radius: 0 4px 4px 0;
+    }
+    
+    .modal-content {
+        border-radius: 10px;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+    }
+    
+    .form-control:focus {
+        border-color: #9999FF;
+        box-shadow: 0 0 0 0.25rem rgba(153, 153, 255, 0.25);
     }
 </style>
 {% endblock style %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow mb-3">
-        <div class="card-header text-white" style="background: #9999FF">
-            <h3 class="mb-0 text-center">Группа: {{group.name}}</h3>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header card-header-custom">
+            <h3 class="mb-0 text-center">
+                <i class="fas fa-users me-2"></i>Группа: {{group.name}}
+            </h3>
         </div>
+        
         <div class="card-body">
-            <p><strong>Курс:</strong> {{group.course.course_name}}</p>
-            <p><strong>Статус:</strong> {{group.status}}</p>
-            <p><strong>Дата начала:</strong> {{group.begin_date}}</p>
-            <p><strong>Дата окончания:</strong> {{group.finish_date}}</p>
-            <p><strong>Преподаватель:</strong> {{group.teacher.surname}} {{group.teacher.name}} {{group.teacher.patronymic}}</p>
+            <!-- Основная информация о группе -->
+            <div class="row">
+                <div class="col-md-6">
+                    <p><i class="fas fa-book me-2"></i><strong>Курс:</strong> {{group.course.course_name}}</p>
+                    <p><i class="fas fa-calendar-alt me-2"></i><strong>Дата начала:</strong> {{group.begin_date|date:"d.m.Y"}}</p>
+                    <p><i class="fas fa-calendar-times me-2"></i><strong>Дата окончания:</strong> {{group.finish_date|date:"d.m.Y"}}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><i class="fas fa-info-circle me-2"></i><strong>Статус:</strong> 
+                        <span class="badge 
+                            {% if group.status == 'Активна' %}bg-success
+                            {% elif group.status == 'Завершена' %}bg-secondary
+                            {% else %}bg-warning text-dark{% endif %}">
+                            {{group.status}}
+                        </span>
+                    </p>
+                    <p><i class="fas fa-chalkboard-teacher me-2"></i><strong>Преподаватель:</strong> 
+                        {{group.teacher.surname}} {{group.teacher.name}} {{group.teacher.patronymic}}
+                    </p>
+                </div>
+            </div>
 
-            <div class="d-flex flex-wrap gap-2">
-                <a href="{% url "enroll_order" group.id %}" class="btn btn-primary">Приказ о зачислении</a>
-                <a href="{% url "lesson_log" group.id %}" class="btn btn-primary">Журнал занятий</a>
+            <!-- Действия с группой -->
+            <div class="action-buttons">
+                <a href="{% url 'enroll_order' group.id %}" class="btn btn-primary-custom">
+                    <i class="fas fa-file-alt me-1"></i> Приказ о зачислении
+                </a>
+                <a href="{% url 'lesson_log' group.id %}" class="btn btn-primary-custom">
+                    <i class="fas fa-clipboard-list me-1"></i> Журнал занятий
+                </a>
                 
                 {% if has_commission %}
-                <a href="{% url "commission_order" group.id %}" class="btn btn-primary">Приказ о назначении комиссии</a>
-                <a href="{% url "protocol" group.id %}" class="btn btn-primary">Протокол экзамена</a>
+                <a href="{% url 'commission_order' group.id %}" class="btn btn-primary-custom">
+                    <i class="fas fa-user-tie me-1"></i> Приказ о комиссии
+                </a>
+                <a href="{% url 'protocol' group.id %}" class="btn btn-primary-custom">
+                    <i class="fas fa-file-signature me-1"></i> Протокол экзамена
+                </a>
                 
                     {% if has_enrollment_order %}
-                    <a href="{% url "exam_sheet" group.id %}" class="btn btn-primary">Аттестационная ведомость</a>
+                    <a href="{% url 'exam_sheet' group.id %}" class="btn btn-primary-custom">
+                        <i class="fas fa-clipboard-check me-1"></i> Аттестационная ведомость
+                    </a>
                     {% else %}
                     <span title="Приказ о зачислении не сформирован">
-                        <button class="btn btn-primary" disabled>Аттестационная ведомость</button>
+                        <button class="btn btn-primary-custom" disabled>
+                            <i class="fas fa-clipboard-check me-1"></i> Аттестационная ведомость
+                        </button>
                     </span>
                     {% endif %}
 
                 {% else %}
-                <span title="Комиссия не назначена">
-                    <button class="btn btn-primary" disabled>Приказ о назначении комиссии</button>
+                <span title="Не назначена комиссия">
+                    <button class="btn btn-primary-custom" disabled>
+                        <i class="fas fa-user-tie me-1"></i> Приказ о комиссии
+                    </button>
                 </span>
-                <span title="Комиссия не назначена">
-                    <button class="btn btn-primary" disabled>Протокол экзамена</button>
+                <span title="Не назначена комиссия">
+                    <button class="btn btn-primary-custom" disabled title="Комиссия не назначена">
+                        <i class="fas fa-file-signature me-1"></i> Протокол экзамена
+                    </button>
                 </span>
-                <span title="Комиссия не назначена">
-                    <button class="btn btn-primary" disabled>Аттестационная ведомость</button>
+                <span title="Не назначена комиссия">
+                    <button class="btn btn-primary-custom" disabled title="Комиссия не назначена">
+                        <i class="fas fa-clipboard-check me-1"></i> Аттестационная ведомость
+                    </button>
                 </span>
                 {% endif %}
 
                 {% if has_exam_protocol and is_group_finished %}
-                <a href="{% url "expel_group" group.id %}" class="btn btn-primary">Приказ о завершении обучения</a>
+                <a href="{% url 'expel_group' group.id %}" class="btn btn-primary-custom">
+                    <i class="fas fa-graduation-cap me-1"></i> Приказ о завершении
+                </a>
                 {% else %}
                 <span title="Не сформирован протокол экзамена/Группа обучается">
-                    <button class="btn btn-primary" disabled >Приказ о завершении обучения</button>
+                    <button class="btn btn-primary-custom" disabled>
+                        <i class="fas fa-graduation-cap me-1"></i> Приказ о завершении
+                    </button>
                 </span>
                 {% endif %}
-                
             </div>
 
-            <h4 class="mt-4">Аттестационная комиссия</h4>
+            <!-- Аттестационная комиссия -->
+            <h4 class="section-title">
+                <i class="fas fa-users-cog me-2"></i>Аттестационная комиссия
+            </h4>
+            
             {% if not group_commission %}
-                <a href="{% url "commission_group_add" group.id %}" class="btn btn-success">Добавить комиссию</a>
+                <a href="{% url 'commission_group_add' group.id %}" class="btn btn-success">
+                    <i class="fas fa-plus me-1"></i> Добавить комиссию
+                </a>
             {% else %}
-            <div class="">
+            <div class="commission-list">
                 {% for commission in group_commission %}
                     {% if commission.role == "Председатель комиссии" %}
-                        <p><strong>Председатель комиссии:</strong> {{commission.commission_member.surname}} {{commission.commission_member.name}}
-                             {{commission.commission_member.patronymic}} - {{commission.commission_member.position}}</p>
+                        <div class="commission-member">
+                            <i class="fas fa-user-tie me-2"></i><strong>Председатель комиссии:</strong> 
+                            {{commission.commission_member.surname}} {{commission.commission_member.name}}
+                            {{commission.commission_member.patronymic}} - {{commission.commission_member.position}}
+                        </div>
                     {% endif %}
                 {% endfor %}
+                
                 {% for commission in group_commission %}
                     {% if commission.role == "Заместитель председателя комиссии" %}
-                        <p><strong>Заместитель председателя комиссии:</strong> {{commission.commission_member.surname}} {{commission.commission_member.name}}
-                            {{commission.commission_member.patronymic}} - {{commission.commission_member.position}}</p>
+                        <div class="commission-member">
+                            <i class="fas fa-user-shield me-2"></i><strong>Заместитель председателя:</strong> 
+                            {{commission.commission_member.surname}} {{commission.commission_member.name}}
+                            {{commission.commission_member.patronymic}} - {{commission.commission_member.position}}
+                        </div>
                     {% endif %}
                 {% endfor %}
+                
                 {% for commission in group_commission %}
                     {% if commission.role == "Секретарь" %}
-                        <p><strong>Секретарь:</strong> {{commission.commission_member.surname}} {{commission.commission_member.name}}
-                            {{commission.commission_member.patronymic}} - {{commission.commission_member.position}}</p>
+                        <div class="commission-member">
+                            <i class="fas fa-user-edit me-2"></i><strong>Секретарь:</strong> 
+                            {{commission.commission_member.surname}} {{commission.commission_member.name}}
+                            {{commission.commission_member.patronymic}} - {{commission.commission_member.position}}
+                        </div>
                     {% endif %}
                 {% endfor %}
+                
                 {% for commission in group_commission %}
                     {% if commission.role == "Член комиссии" %}
-                        <p><strong>Член комиссии:</strong> {{commission.commission_member.surname}} {{commission.commission_member.name}}
-                            {{commission.commission_member.patronymic}} - {{commission.commission_member.position}}</p>
+                        <div class="commission-member">
+                            <i class="fas fa-user-friends me-2"></i><strong>Член комиссии:</strong> 
+                            {{commission.commission_member.surname}} {{commission.commission_member.name}}
+                            {{commission.commission_member.patronymic}} - {{commission.commission_member.position}}
+                        </div>
                     {% endif %}
                 {% endfor %}
+                
+                <div class="mt-3">
+                    <a href="{% url 'commission_group_edit' group.id %}" class="btn btn-warning-custom">
+                        <i class="fas fa-edit me-1"></i> Редактировать комиссию
+                    </a>
+                </div>
             </div>
-            <a href="{% url "commission_group_edit" group.id %}" class="btn btn-edit">Редактировать</a>
             {% endif %}
             
-            <h4 class="mt-4">Список слушателей</h4>
+            <!-- Список слушателей -->
+            <h4 class="section-title">
+                <i class="fas fa-user-graduate me-2"></i>Список слушателей
+            </h4>
+            
             {% if student_groups %}
-            <table class="table table-bordered mt-2">
-                <thead class="table-dark">
-                    <tr class="text-center">
-                        <th>№</th>
-                        <th>Имя</th>
-                        <th>Форма обучения</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for student_group in student_groups %}
-                        <tr class="text-center">
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ student_group.student.surname }} {{ student_group.student.name }} {{ student_group.student.patronymic }}</td>
-                            <td>{{ student_group.ed_kind|default:"-" }}</td>
-                            <td>
-                                <button class="btn btn-danger btn-sm remove-student" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#removeModal"
-                                    data-student-id="{{student_group.student.id}}"
-                                    data-student-name="{{ student_group.student.surname }} {{ student_group.student.name }}">
-                                    Отчислить
-                                </button>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-                <table class="table table-bordered mt-2">
-                    <thead class="table-dark">
+            <div class="table-responsive">
+                <table class="table table-custom table-hover">
+                    <thead>
                         <tr class="text-center">
                             <th>№</th>
-                            <th>Имя</th>
+                            <th>ФИО</th>
                             <th>Форма обучения</th>
+                            <th>Действия</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for student_ed_kind in students_ed_kind %}
+                        {% for student_group in student_groups %}
                             <tr class="text-center">
                                 <td>{{ forloop.counter }}</td>
-                                <td>{{ student_ed_kind.0.surname }} {{ student_ed_kind.0.name }} {{ student_ed_kind.0.patronymic }}</td>
-                                <td>{{ student_ed_kind.1|default:"-" }}</td>
+                                <td>{{ student_group.student.surname }} {{ student_group.student.name }} {{ student_group.student.patronymic }}</td>
+                                <td>{{ student_group.ed_kind|default:"-" }}</td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm btn-danger-custom remove-student" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#removeModal"
+                                        data-student-id="{{student_group.student.id}}"
+                                        data-student-name="{{ student_group.student.surname }} {{ student_group.student.name }}">
+                                        <i class="fas fa-user-minus me-1"></i> Отчислить
+                                    </button>
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>В группе нет слушателей
+                </div>
             {% endif %}
             
+            <!-- Кнопка завершения обучения -->
             {% if not is_group_finished and has_exam_protocol %}
             <form id="finish-course-form" method="POST" action="{% url 'finish_course' group.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="student_ids" id="student-ids">
-                <!-- Кнопка завершения курса -->
-                 <div class="text-center">
-                    <button type="submit" id="remove-all" class="btn btn-warning mt-3">Завершить обучение</button>
+                <div class="text-center mt-4">
+                    <button type="submit" id="remove-all" class="btn btn-warning-custom">
+                        <i class="fas fa-graduation-cap me-1"></i> Завершить обучение
+                    </button>
                 </div>
             </form>
             {% else %}
-                <div class="text-center">
-                    <span title="Не сформирован протокол экзамена/Группа завершила обучение">
-                        <button type="submit" id="remove-all" class="btn btn-warning mt-3" disabled>Завершить обучение</button>
+                <div class="text-center mt-4">
+                    <span title="{% if is_group_finished %}Группа уже завершила обучение{% else %}Не сформирован протокол экзамена{% endif %}">
+                        <button type="button" class="btn btn-warning-custom" disabled>
+                            <i class="fas fa-graduation-cap me-1"></i> Завершить обучение
+                        </button>
                     </span>
                 </div>
             {% endif %}
-            
-            
+        </div>
+    </div>
+</div>
 
-            <!-- 🔹 Модальное окно для указания причины отчисления -->
-            <div class="modal fade" id="removeModal" tabindex="-1" aria-labelledby="removeModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="removeModalLabel">Отчисление студента</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-                        </div>
-                        <form method="POST" action="{% url 'group_detail' group.id %}">
-                            {% csrf_token %}
-                            <div class="modal-body">
-                                <p><strong>Вы действительно хотите отчислить студента?</strong></p>
-                                <p id="student-name"></p>
-
-                                <input type="hidden" name="student_id" id="student-id">
-                                
-                                <div class="mb-3">
-                                    <label for="reason" class="form-label">Причина отчисления</label>
-                                    <textarea class="form-control" name="reason" id="reason" rows="3" required></textarea>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                                <button type="submit" class="btn btn-danger">Отчислить</button>
-                            </div>
-                        </form>
+<!-- Модальное окно отчисления -->
+<div class="modal fade" id="removeModal" tabindex="-1" aria-labelledby="removeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeModalLabel">
+                    <i class="fas fa-user-minus me-2"></i>Отчисление студента
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <form method="POST" action="{% url 'group_detail' group.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p><strong>Вы действительно хотите отчислить студента?</strong></p>
+                    <p id="student-name" class="fw-bold"></p>
+                    
+                    <input type="hidden" name="student_id" id="student-id">
+                    
+                    <div class="mb-3">
+                        <label for="reason" class="form-label">Причина отчисления</label>
+                        <textarea class="form-control" name="reason" id="reason" rows="3" required></textarea>
                     </div>
                 </div>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Отмена
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-user-minus me-1"></i> Отчислить
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -227,46 +371,39 @@
             if (studentId) {
                 document.getElementById("student-id").value = studentId;
                 document.getElementById("student-name").textContent = "Студент: " + studentName;
-            } else {
-                console.error("Ошибка: studentId не найден");
-            }
-        });
-    });
-    // Обработчик нажатия на "Завершить курс"
-    document.getElementById("finish-course-form").addEventListener("submit", function(e) {
-        // Предотвращаем стандартную отправку формы
-        e.preventDefault();
-        
-        let studentIds = [];
-        // Ищем все кнопки отчисления в таблице
-        let removeButtons = document.querySelectorAll(".remove-student");
-        
-        if (removeButtons.length === 0) {
-            alert("Нет студентов для отчисления.");
-            return;
-        }
-        
-        // Собираем ID всех студентов
-        removeButtons.forEach(button => {
-            let studentId = button.getAttribute("data-student-id");
-            if (studentId) {
-                studentIds.push(studentId);
             }
         });
         
-        if (studentIds.length === 0) {
-            alert("Нет студентов для отчисления.");
-            return;
-        }
-        
-        // Записываем ID в скрытое поле формы
-        document.getElementById("student-ids").value = JSON.stringify(studentIds);
-        
-        // Подтверждение действия
-        if (confirm("Вы уверены, что хотите завершить обучение для всей группы? Все студенты будут отчислены.")) {
-            // Отправляем форму
-            this.submit();
-        }
+        // Обработчик завершения обучения
+        document.getElementById("finish-course-form")?.addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            let studentIds = [];
+            let removeButtons = document.querySelectorAll(".remove-student");
+            
+            if (removeButtons.length === 0) {
+                alert("Нет студентов для отчисления.");
+                return;
+            }
+            
+            removeButtons.forEach(button => {
+                let studentId = button.getAttribute("data-student-id");
+                if (studentId) {
+                    studentIds.push(studentId);
+                }
+            });
+            
+            if (studentIds.length === 0) {
+                alert("Нет студентов для отчисления.");
+                return;
+            }
+            
+            document.getElementById("student-ids").value = JSON.stringify(studentIds);
+            
+            if (confirm("Вы уверены, что хотите завершить обучение для всей группы? Все студенты будут отчислены.")) {
+                this.submit();
+            }
+        });
     });
 </script>
 {% endblock content %}

@@ -6,147 +6,210 @@
 {% block style %}
 <style>
     body {
-        background-color: #FFFFFF;
-        color: #000000;
+        background-color: #f8f9fa;
     }
-    .card {
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        transition: all 0.3s ease;
-    }
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-    .btn-add {
-        background-color: #28a745;
-        color: white;
-        border: none;
-    }
-    .btn-add:hover {
-        background-color: #218838;
-    }
-    .btn-edit {
-        background-color: #ffc107;
-        color: black;
-        border: none;
-    }
-    .btn-edit:hover {
-        background-color: #e0a800;
-    }
-    .btn-delete {
-        background-color: #dc3545;
-        color: white;
-        border: none;
-    }
-    .btn-delete:hover {
-        background-color: #c82333;
-    }
-    .search-container {
-        position: relative;
-    }
-    .search-icon {
-        position: absolute;
-        top: 50%;
-        right: 15px;
-        transform: translateY(-50%);
-        color: #999;
-    }
-    .no-results {
-        text-align: center;
-        padding: 20px;
-        color: #6c757d;
+    .section-title {
+        color: #555;
+        font-weight: 600;
+        border-bottom: 2px solid #9999FF;
+        padding-bottom: 8px;
+        margin-bottom: 20px;
     }
     .teacher-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
+        height: 100%;
+    }
+    .teacher-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+    .info-icon {
+        color: #9999FF;
+        width: 20px;
+        text-align: center;
+        margin-right: 10px;
+    }
+    .btn-primary {
+        background-color: #9999FF;
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        background-color: #8888EE;
+        color: white;
+    }
+    .btn-outline {
+        border: 1px solid #9999FF;
+        color: #9999FF;
+        background: transparent;
+    }
+    .btn-outline:hover {
+        background-color: #f0f0ff;
+    }
+    .filter-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+    .avatar-container {
+        width: 80px;
+        height: 80px;
+        min-width: 80px;
+    }
+    .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #9999FF;
+    }
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9999FF;
+        font-size: 24px;
+        border: 2px solid #9999FF;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+    .empty-state-icon {
+        font-size: 3rem;
+        color: #9999FF;
+        margin-bottom: 1rem;
+    }
+    .position-badge {
+        display: inline-block;
+        background-color: #e9ecef;
+        border-radius: 15px;
+        padding: 3px 10px;
+        margin: 2px;
+        font-size: 0.8rem;
+    }
+    .position-professor {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .position-docent {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    .position-teacher {
+        background-color: #e2e3e5;
+        color: #383d41;
     }
 </style>
 {% endblock style %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="text-center mb-4">Преподаватели</h2>
+    <h2 class="section-title text-center">
+        <i class="fas fa-chalkboard-teacher me-2"></i>Преподаватели
+    </h2>
 
-    <!-- Поле поиска и кнопка добавления -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3 mb-md-0">
-            <a class="btn btn-add w-100" href="{% url 'teacher_add' %}">
-                <i class="fas fa-plus me-2"></i>Добавить преподавателя
-            </a>
-        </div>
-        <div class="col-md-9 search-container">
-            <input type="text" id="searchInput" class="form-control" placeholder="Поиск по ФИО или должности">
-            <i class="fas fa-search search-icon"></i>
+    <!-- Форма фильтрации и добавления -->
+    <div class="filter-card">
+        <div class="row align-items-end">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <a href="{% url 'teacher_add' %}" class="btn btn-primary w-100">
+                    <i class="fas fa-plus me-2"></i> Добавить преподавателя
+                </a>
+            </div>
+            <div class="col-md-8">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" id="searchInput" class="form-control" 
+                           placeholder="Поиск по ФИО или должности">
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Карточки преподавателей -->
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="teachersList">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="teachersList">
         {% for teacher in teachers %}
-        <div class="col teacher-card" 
-             data-name="{{ teacher.surname|lower }} {{ teacher.name|lower }} {{ teacher.patronymic|lower }}"
-             data-position="{{ teacher.position|lower }}">
-            <div class="card p-3 text-center">
+        <div class="col teacher-card-container">
+            <div class="card teacher-card p-3">
                 <div class="card-body">
-                    <h5 class="card-title">{{ teacher.surname }} {{ teacher.name }} {{ teacher.patronymic }}</h5>
-                    <p class="card-text text-muted">{{ teacher.position }}</p>
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="avatar-container me-3">
+                            {% if teacher.photo %}
+                                <img src="{{ teacher.photo.url }}" class="avatar-img" alt="Фото преподавателя">
+                            {% else %}
+                                <div class="avatar-placeholder">
+                                    <i class="fas fa-user-tie"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">{{ teacher.surname }} {{ teacher.name }} {{ teacher.patronymic }}</h5>
+                            <p class="card-text mb-1">
+                                <span class="position-badge 
+                                    {% if 'профессор' in teacher.position.lower %}position-professor
+                                    {% elif 'доцент' in teacher.position.lower %}position-docent
+                                    {% else %}position-teacher{% endif %}">
+                                    {{ teacher.position }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a class="btn btn-edit w-100 mb-2" href="{% url 'teacher_edit' teacher.id %}">
-                        <i class="fas fa-edit me-2"></i>Редактировать
-                    </a>
-                    <form action="{% url 'teachers' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" value="{{ teacher.id }}" name='teacher_id'>
-                        <button type="submit" class="btn btn-delete w-100">
-                            <i class="fas fa-trash-alt me-2"></i>Удалить
-                        </button>
-                    </form>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'teacher_edit' teacher.id %}" class="btn btn-outline flex-grow-1">
+                            <i class="fas fa-edit me-2"></i> Редактировать
+                        </a>
+                        <form action="{% url 'teachers' %}" method="post" class="flex-grow-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="teacher_id" value="{{ teacher.id }}">
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="fas fa-trash-alt me-2"></i> Удалить
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="empty-state">
+                <i class="fas fa-user-graduate empty-state-icon"></i>
+                <h4>Преподаватели не найдены</h4>
+                <p class="mb-0">Добавьте первого преподавателя</p>
+            </div>
+        </div>
         {% endfor %}
-    </div>
-
-    <div id="noResults" class="no-results" style="display: none;">
-        <i class="fas fa-search fa-2x mb-3"></i>
-        <h5>Преподаватели не найдены</h5>
-        <p>Попробуйте изменить параметры поиска</p>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
-    const teacherCards = document.querySelectorAll('.teacher-card');
-    const noResults = document.getElementById('noResults');
+    const teacherCards = document.querySelectorAll('.teacher-card-container');
     
     searchInput.addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
-        let visibleCount = 0;
         
         teacherCards.forEach(card => {
-            const name = card.dataset.name;
-            const position = card.dataset.position;
-            
-            if (name.includes(searchTerm) || position.includes(searchTerm)) {
+            const text = card.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
                 card.style.display = 'block';
-                visibleCount++;
             } else {
                 card.style.display = 'none';
             }
         });
-        
-        if (visibleCount === 0 && searchTerm.length > 0) {
-            noResults.style.display = 'block';
-        } else {
-            noResults.style.display = 'none';
-        }
     });
 });
 </script>

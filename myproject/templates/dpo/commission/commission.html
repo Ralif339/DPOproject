@@ -6,109 +6,184 @@
 {% block style %}
 <style>
     body {
-        background-color: #FFFFFF;
-        color: #000000;
+        background-color: #f8f9fa;
     }
-    .card {
-        border: 1px solid #ddd;
+    .section-title {
+        color: #555;
+        font-weight: 600;
+        border-bottom: 2px solid #9999FF;
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+    }
+    .commission-card {
+        border: none;
         border-radius: 10px;
-        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
         height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+    }
+    .commission-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+    .info-icon {
+        color: #9999FF;
+        width: 20px;
+        text-align: center;
+        margin-right: 10px;
+    }
+    .btn-primary {
+        background-color: #9999FF;
+        color: white;
+        border: none;
         transition: all 0.3s ease;
     }
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-    .btn-add {
-        background-color: #28a745;
+    .btn-primary:hover {
+        background-color: #8888EE;
         color: white;
     }
-    .btn-add:hover {
-        background-color: #218838;
+    .btn-outline {
+        border: 1px solid #9999FF;
+        color: #9999FF;
+        background: transparent;
     }
-    .btn-edit {
-        background-color: #ffc107;
-        color: black;
+    .btn-outline:hover {
+        background-color: #f0f0ff;
     }
-    .btn-edit:hover {
-        background-color: #e0a800;
-    }
-    .btn-delete {
-        background-color: #dc3545;
-        color: white;
-    }
-    .btn-delete:hover {
-        background-color: #c82333;
-    }
-    .search-container {
-        position: relative;
-    }
-    .search-icon {
-        position: absolute;
-        top: 50%;
-        right: 15px;
-        transform: translateY(-50%);
-        color: #999;
-    }
-    .no-results {
-        text-align: center;
+    .filter-card {
+        background: white;
         padding: 20px;
-        color: #6c757d;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+    .avatar-container {
+        width: 80px;
+        height: 80px;
+        min-width: 80px;
+    }
+    .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #9999FF;
+    }
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9999FF;
+        font-size: 24px;
+        border: 2px solid #9999FF;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+    .empty-state-icon {
+        font-size: 3rem;
+        color: #9999FF;
+        margin-bottom: 1rem;
+    }
+    .position-badge {
+        display: inline-block;
+        background-color: #e9ecef;
+        border-radius: 15px;
+        padding: 3px 10px;
+        margin: 2px;
+        font-size: 0.8rem;
+    }
+    .position-chair {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .position-member {
+        background-color: #fff3cd;
+        color: #856404;
     }
 </style>
 {% endblock style %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="text-center mb-4">Аттестационная комиссия</h2>
+    <h2 class="section-title text-center">
+        <i class="fas fa-users-cog me-2"></i>Аттестационная комиссия
+    </h2>
 
-    <!-- Поле поиска и кнопка добавления -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3 mb-md-0">
-            <a class="btn btn-add w-100" href="{% url 'commission_add' %}">
-                <i class="fas fa-plus me-2"></i>Добавить члена комиссии
-            </a>
-        </div>
-        <div class="col-md-9 search-container">
-            <input type="text" id="searchInput" class="form-control" placeholder="Поиск по ФИО или должности">
-            <i class="fas fa-search search-icon" style="padding-right: 10px"></i>
+    <!-- Форма фильтрации и добавления -->
+    <div class="filter-card">
+        <div class="row align-items-end">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <a href="{% url 'commission_add' %}" class="btn btn-primary w-100">
+                    <i class="fas fa-plus me-2"></i> Добавить члена комиссии
+                </a>
+            </div>
+            <div class="col-md-8">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" id="searchInput" class="form-control" 
+                           placeholder="Поиск по ФИО или должности">
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Карточки членов комиссии -->
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="commissionList">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="commissionList">
         {% for member in commission %}
         <div class="col member-card">
-            <div class="card p-3 text-center">
+            <div class="card commission-card p-3">
                 <div class="card-body">
-                    <h5 class="card-title">{{ member.surname }} {{ member.name }} {{ member.patronymic }}</h5>
-                    <p class="card-text text-muted">{{ member.position }}</p>
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="avatar-container me-3">
+                            {% if member.photo %}
+                                <img src="{{ member.photo.url }}" class="avatar-img" alt="Фото члена комиссии">
+                            {% else %}
+                                <div class="avatar-placeholder">
+                                    <i class="fas fa-user-tie"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">{{ member.surname }} {{ member.name }} {{ member.patronymic }}</h5>
+                            <p class="card-text mb-1">
+                                <span class="position-badge {% if 'председатель' in member.position.lower %}position-chair{% else %}position-member{% endif %}">
+                                    {{ member.position }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a class="btn btn-edit w-100 mb-2" href="{% url 'commission_edit' member.id %}">
-                        <i class="fas fa-edit me-2"></i>Редактировать
-                    </a>
-                    <form action="{% url 'commission' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="member_id" value="{{ member.id }}">
-                        <button type="submit" class="btn btn-delete w-100">
-                            <i class="fas fa-trash-alt me-2"></i>Удалить
-                        </button>
-                    </form>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'commission_edit' member.id %}" class="btn btn-outline flex-grow-1">
+                            <i class="fas fa-edit me-2"></i> Редактировать
+                        </a>
+                        <form action="{% url 'commission' %}" method="post" class="flex-grow-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="member_id" value="{{ member.id }}">
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="fas fa-trash-alt me-2"></i> Удалить
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="empty-state">
+                <i class="fas fa-users-slash empty-state-icon"></i>
+                <h4>Члены комиссии не найдены</h4>
+                <p class="mb-0">Добавьте первого члена аттестационной комиссии</p>
+            </div>
+        </div>
         {% endfor %}
-    </div>
-    
-    <div id="noResults" class="no-results" style="display: none;">
-        <i class="fas fa-search fa-2x mb-3"></i>
-        <h5>Члены комиссии не найдены</h5>
-        <p>Попробуйте изменить параметры поиска</p>
     </div>
 </div>
 
@@ -116,27 +191,18 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const memberCards = document.querySelectorAll('.member-card');
-    const noResults = document.getElementById('noResults');
     
     searchInput.addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
-        let visibleCount = 0;
         
         memberCards.forEach(card => {
             const text = card.textContent.toLowerCase();
             if (text.includes(searchTerm)) {
                 card.style.display = 'block';
-                visibleCount++;
             } else {
                 card.style.display = 'none';
             }
         });
-        
-        if (visibleCount === 0 && searchTerm.length > 0) {
-            noResults.style.display = 'block';
-        } else {
-            noResults.style.display = 'none';
-        }
     });
 });
 </script>

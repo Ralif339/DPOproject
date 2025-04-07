@@ -112,7 +112,7 @@
 {% endblock style %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4 mb-3">
     <h2 class="section-title text-center">
         <i class="fas fa-users me-2"></i>Слушатели
     </h2>
@@ -199,7 +199,7 @@
                                 <p class="card-text text-muted mb-1">
                                     <small>
                                         <i class="fas fa-birthday-cake me-1"></i>
-                                        {{ student.birthday|date:"d.m.Y" }} ({{ student.age }} лет)
+                                        {{ student.birthday|date:"d.m.Y" }}
                                     </small>
                                 </p>
                                 <p class="card-text mb-1">

@@ -1,93 +1,80 @@
 {% extends "manager_navigation.html" %}
 {% load static %}
 
+{% block title %}Курсы{% endblock title %}
+
 {% block style %}
 <style>
     body {
-        background-color: #FFFFFF;
-        color: #000000;
+        background-color: #f8f9fa;
     }
-    .sidebar {
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 10px;
-        border: 1px solid #eee;
+    .section-title {
+        color: #555;
+        font-weight: 600;
+        border-bottom: 2px solid #9999FF;
+        padding-bottom: 8px;
+        margin-bottom: 20px;
     }
-    .card {
-        border: 1px solid #ddd;
+    .course-card {
+        border: none;
         border-radius: 10px;
-        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
+        height: 100%;
     }
-    .card:hover {
+    .course-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     }
-    .btn-add {
-        background-color: #28a745;
-        color: white;
-        border: none;
+    .info-icon {
+        color: #9999FF;
+        width: 20px;
+        text-align: center;
+        margin-right: 10px;
     }
-    .btn-add:hover {
-        background-color: #218838;
-    }
-    .btn-edit {
-        background-color: #ffc107;
-        color: black;
-        border: none;
-    }
-    .btn-edit:hover {
-        background-color: #e0a800;
-    }
-    .btn-delete {
-        background-color: #dc3545;
-        color: white;
-        border: none;
-    }
-    .btn-delete:hover {
-        background-color: #c82333;
-    }
-    .btn-filter {
+    .btn-primary {
         background-color: #9999FF;
         color: white;
         border: none;
+        transition: all 0.3s ease;
     }
-    .btn-filter:hover {
+    .btn-primary:hover {
         background-color: #8888EE;
-    }
-    .btn-reset {
-        background-color: #6c757d;
         color: white;
-        border: none;
     }
-    .btn-reset:hover {
-        background-color: #5a6268;
+    .btn-outline {
+        border: 1px solid #9999FF;
+        color: #9999FF;
+        background: transparent;
     }
-    .filter-buttons {
-        display: flex;
-        gap: 10px;
+    .btn-outline:hover {
+        background-color: #f0f0ff;
     }
-    .filter-buttons .btn {
-        flex: 1;
+    .filter-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
     }
-    .no-results {
+    .sidebar {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .empty-state {
         text-align: center;
         padding: 40px;
-        color: #6c757d;
+    }
+    .empty-state-icon {
+        font-size: 3rem;
+        color: #9999FF;
+        margin-bottom: 1rem;
     }
     .form-control:focus, .form-select:focus {
         border-color: #9999FF;
         box-shadow: 0 0 0 0.2rem rgba(153, 153, 255, 0.25);
-    }
-    .card-icon {
-        color: #666; /* Темно-серый цвет для иконок */
-        margin-right: 8px;
-        width: 20px;
-        text-align: center;
     }
     .search-container {
         position: relative;
@@ -99,24 +86,62 @@
         transform: translateY(-50%);
         color: #999;
     }
+    .filter-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .filter-buttons .btn {
+        flex: 1;
+    }
+    .card-icon {
+        color: #9999FF;
+        margin-right: 8px;
+        width: 20px;
+        text-align: center;
+    }
+    .type-badge {
+        display: inline-block;
+        background-color: #e9ecef;
+        border-radius: 15px;
+        padding: 3px 10px;
+        margin: 2px;
+        font-size: 0.8rem;
+    }
+    .type-pp {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .type-kpk {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    .type-op {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+    .type-po {
+        background-color: #e2e3e5;
+        color: #383d41;
+    }
 </style>
 {% endblock style %}
 
-{% block title %}Курсы{% endblock title %}
-
 {% block content %}
 <div class="container mt-4">
-    <h2 class="text-center mb-4">Список курсов</h2>
+    <h2 class="section-title text-center">
+        <i class="fas fa-book me-2"></i>Список курсов
+    </h2>
 
     <div class="row">
         <!-- Фильтрация (слева) -->
         <div class="col-md-3">
-            <a class="btn btn-add w-100 mb-3" href="{% url 'course_add' %}">
+            <a class="btn btn-primary w-100 mb-3" href="{% url 'course_add' %}">
                 <i class="fas fa-plus me-2"></i>Добавить курс
             </a>
             <div class="sidebar">
                 <form id="filterForm">
-                    <h6><i class="fas fa-filter me-2"></i>Фильтрация</h6>
+                    <h6 class="mb-3"><i class="fas fa-filter me-2"></i>Фильтрация</h6>
                     
                     <!-- Поиск по названию -->
                     <label class="form-label">Поиск по названию</label>
@@ -145,10 +170,10 @@
                     </select>
 
                     <div class="filter-buttons">
-                        <button type="submit" class="btn btn-filter">
+                        <button type="submit" class="btn btn-primary">
                             <i class="fas fa-check me-2"></i>Применить
                         </button>
-                        <a href="{% url 'courses' %}" class="btn btn-reset">
+                        <a href="{% url 'courses' %}" class="btn btn-outline">
                             <i class="fas fa-undo me-2"></i>Сбросить
                         </a>
                     </div>
@@ -160,41 +185,57 @@
         <div class="col-md-9">
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="coursesList">
                 {% for course in courses %}
-                <div class="col course-card" 
+                <div class="col course-card-container" 
                      data-name="{{ course.course_name|lower }}"
                      data-type="{{ course.course_type }}">
-                    <div class="card p-3">
+                    <div class="card course-card p-3">
                         <div class="card-body">
-                            <h5 class="card-title">{{ course.course_name }}</h5>
-                            <p><i class="fas fa-graduation-cap card-icon"></i><strong>Тип:</strong> {{ course.course_type }}</p>
-                            <p><i class="fas fa-ruble-sign card-icon"></i><strong>Стоимость (бюджет):</strong> 
-                                {{ course.price_b|floatformat:2|default:"0.00" }} руб.</p>
-                            <p><i class="fas fa-money-bill-wave card-icon"></i><strong>Стоимость (внебюджет):</strong> 
-                                {{ course.price_vb|floatformat:2|default:"0.00" }} руб.</p>
-                            <p><i class="fas fa-clock card-icon"></i><strong>Количество часов:</strong> {{ course.hours_count }} ч.</p>
+                            <h5 class="card-title mb-3">{{ course.course_name }}</h5>
+                            <p class="mb-2">
+                                <span class="type-badge 
+                                    {% if 'профессиональная переподготовка' in course.course_type|lower %}type-pp
+                                    {% elif 'курсы повышения квалификации' in course.course_type|lower %}type-kpk
+                                    {% elif 'общеобразовательные программы' in course.course_type|lower %}type-op
+                                    {% else %}type-po{% endif %}">
+                                    <i class="fas fa-graduation-cap me-1"></i> {{ course.course_type }}
+                                </span>
+                            </p>
+                            <p class="mb-2"><i class="fas fa-ruble-sign card-icon"></i>Стоимость (бюджет): {{ course.price_b|floatformat:2|default:"0.00" }} руб.</p>
+                            <p class="mb-2"><i class="fas fa-money-bill-wave card-icon"></i>Стоимость (внебюджет): {{ course.price_vb|floatformat:2|default:"0.00" }} руб.</p>
+                            <p class="mb-0"><i class="fas fa-clock card-icon"></i>Количество часов: {{ course.hours_count }} ч.</p>
                         </div>
                         <div class="card-footer bg-transparent border-0 pt-0">
-                            <a class="btn btn-edit w-100 mb-2" href="{% url 'course_edit' course.id %}">
-                                <i class="fas fa-edit me-2"></i>Редактировать
-                            </a>
-                            <form action="{% url 'courses' %}" method="POST">
-                                {% csrf_token %}
-                                <input type="hidden" name="course_id" value="{{ course.id }}">
-                                <input type="hidden" name="action" value="delete">
-                                <button class="btn btn-delete w-100" type="submit">
-                                    <i class="fas fa-trash-alt me-2"></i>Удалить
-                                </button>
-                            </form> 
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'course_edit' course.id %}" class="btn btn-outline flex-grow-1">
+                                    <i class="fas fa-edit me-2"></i>Редактировать
+                                </a>
+                                <form action="{% url 'courses' %}" method="POST" class="flex-grow-1">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="course_id" value="{{ course.id }}">
+                                    <input type="hidden" name="action" value="delete">
+                                    <button class="btn btn-danger w-100" type="submit">
+                                        <i class="fas fa-trash-alt me-2"></i>Удалить
+                                    </button>
+                                </form>
+                            </div>
                         </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="empty-state">
+                        <i class="fas fa-book-open empty-state-icon"></i>
+                        <h4>Курсы не найдены</h4>
+                        <p class="mb-0">Добавьте первый курс</p>
                     </div>
                 </div>
                 {% endfor %}
             </div>
             
-            <div id="noResults" class="no-results" style="display: none;">
-                <i class="fas fa-search fa-2x mb-3"></i>
-                <h5>Курсы не найдены</h5>
-                <p>Попробуйте изменить параметры поиска</p>
+            <div id="noResults" class="empty-state" style="display: none;">
+                <i class="fas fa-search empty-state-icon"></i>
+                <h4>Курсы не найдены</h4>
+                <p class="mb-0">Попробуйте изменить параметры поиска</p>
             </div>
         </div>
     </div>
@@ -204,7 +245,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const typeFilter = document.getElementById('typeFilter');
-    const courseCards = document.querySelectorAll('.course-card');
+    const courseCards = document.querySelectorAll('.course-card-container');
     const noResults = document.getElementById('noResults');
     const filterForm = document.getElementById('filterForm');
     

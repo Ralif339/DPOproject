@@ -1,138 +1,285 @@
 {% extends "manager_navigation.html" %}
 {% load static %}
 
+{% block title %}Управление группами{% endblock title %}
+
 {% block style %}
 <style>
+    :root {
+        --primary-color: #6c63ff;
+        --primary-hover: #5a52e0;
+        --success-color: #28a745;
+        --success-hover: #218838;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    body {
+        background-color: #f8f9fa;
+    }
+    
+    .header-container {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .filter-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .table-container {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 1.5rem;
+        overflow: hidden;
+    }
+    
     .btn-add {
-        background-color: #28a745;
+        background-color: var(--success-color);
         color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 0.5rem 1.25rem;
+        transition: all 0.3s ease;
     }
+    
     .btn-add:hover {
-        background-color: #218838;
-    }
-    .btn-apply {
-        background-color: #9999FF;
+        background-color: var(--success-hover);
+        transform: translateY(-2px);
         color: white;
     }
+    
+    .btn-apply {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        transition: all 0.3s ease;
+    }
+    
     .btn-apply:hover {
-        background-color: #8888EE;
+        background-color: var(--primary-hover);
+        color: white;
+    }
+    
+    .table {
+        margin-bottom: 0;
+    }
+    
+    .table thead th {
+        border-bottom: 2px solid #e9ecef;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .status-badge {
+        padding: 0.35rem 0.65rem;
+        border-radius: 50rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .status-active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-completed {
+        background-color: #e2e3e5;
+        color: #383d41;
+    }
+    
+    .status-planned {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s;
+    }
+    
+    .action-btn:hover {
+        transform: scale(1.1);
+    }
+    
+    .empty-state {
+        padding: 2rem;
+        text-align: center;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 2.5rem;
+        color: #dee2e6;
+        margin-bottom: 1rem;
+    }
+    .bg-primary {
+        background: #9999FF;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Группы слушателей</h2>
+<div class="container py-4">
+    <!-- Заголовок и кнопка добавления -->
+    <div class="header-container d-flex justify-content-between align-items-center">
+        <h2 class="mb-0"><i class="fas fa-users me-2"></i>Управление группами</h2>
         <a href="{% url 'group_add' %}" class="btn btn-add">
-            <i class="fas fa-plus me-1"></i> Добавить группу
+            <i class="fas fa-plus me-1"></i> Новая группа
         </a>
     </div>
 
     <!-- Форма фильтрации -->
-    <form method="get" id="filterForm" class="mb-4">
-        <div class="row g-2">
-            <!-- Поиск -->
-            <div class="col-md-3">
-                <input type="text" name="search" class="form-control" 
-                       placeholder="Поиск по группе или курсу"
-                       value="{{ current_search|default:'' }}">
+    <div class="filter-card">
+        <form method="get" id="filterForm">
+            <div class="row g-3 align-items-end">
+                <!-- Поиск -->
+                <div class="col-md-4">
+                    <label class="form-label">Поиск</label>
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Название группы или курс"
+                           value="{{ current_search|default:'' }}">
+                </div>
+                
+                <!-- Тип курса -->
+                <div class="col-md-2">
+                    <label class="form-label">Тип курса</label>
+                    <select name="course_type" class="form-select">
+                        <option value="">Все типы</option>
+                        {% for type in course_types %}
+                        <option value="{{ type }}" {% if current_course_type == type %}selected{% endif %}>
+                            {{ type }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Преподаватель -->
+                <div class="col-md-2">
+                    <label class="form-label">Преподаватель</label>
+                    <select name="teacher" class="form-select">
+                        <option value="">Все</option>
+                        {% for teacher in teachers %}
+                        <option value="{{ teacher.teacher__id }}" {% if current_teacher|stringformat:"s" == teacher.teacher__id|stringformat:"s" %}selected{% endif %}>
+                            {{ teacher.teacher__surname }} {{ teacher.teacher__name.0 }}.
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Статус -->
+                <div class="col-md-2">
+                    <label class="form-label">Статус</label>
+                    <select name="status" class="form-select">
+                        <option value="">Все</option>
+                        {% for status in statuses %}
+                        <option value="{{ status }}" {% if current_status == status %}selected{% endif %}>
+                            {{ status }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Кнопки -->
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-apply flex-grow-1">
+                        <i class="fas fa-filter me-1"></i> Применить
+                    </button>
+                    <a href="{% url 'groups' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-undo"></i>
+                    </a>
+                </div>
             </div>
-            
-            <!-- Тип курса -->
-            <div class="col-md-2">
-                <select name="course_type" class="form-select">
-                    <option value="">Все типы</option>
-                    {% for type in course_types %}
-                    <option value="{{ type }}" {% if current_course_type == type %}selected{% endif %}>
-                        {{ type }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <!-- Преподаватель -->
-            <div class="col-md-2">
-                <select name="teacher" class="form-select">
-                    <option value="">Все преподаватели</option>
-                    {% for teacher in teachers %}
-                    <option value="{{ teacher.teacher__id }}" {% if current_teacher|stringformat:"s" == teacher.teacher__id|stringformat:"s" %}selected{% endif %}>
-                        {{ teacher.teacher__surname }} {{ teacher.teacher__name.0 }}.
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <!-- Статус -->
-            <div class="col-md-2">
-                <select name="status" class="form-select">
-                    <option value="">Все статусы</option>
-                    {% for status in statuses %}
-                    <option value="{{ status }}" {% if current_status == status %}selected{% endif %}>
-                        {{ status }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <!-- Кнопки -->
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-apply w-100">Применить</button>
-            </div>
-            <div class="col-md-1">
-                <a href="{% url 'groups' %}" class="btn btn-secondary w-100">Сбросить</a>
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
 
-    <!-- Таблица -->
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead class="table-light">
-                <tr>
-                    <th>Название</th>
-                    <th>Курс</th>
-                    <th>Преподаватель</th>
-                    <th>Период</th>
-                    <th>Тип</th>
-                    <th>Слушатели</th>
-                    <th>Статус</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for group in groups %}
-                <tr>
-                    <td>{{ group.name }}</td>
-                    <td>{{ group.course.course_name }}</td>
-                    <td>{{ group.teacher.surname }} {{ group.teacher.name.0 }}.</td>
-                    <td>{{ group.begin_date|date:"d.m.Y" }} - {{ group.finish_date|date:"d.m.Y" }}</td>
-                    <td>{{ group.course.course_type }}</td>
-                    <td class="text-center">{{ group.student_count }}</td>
-                    <td>{{ group.status }}</td>
-                    <td>
-                        <a href="{% url 'group_detail' group.id %}" class="btn btn-sm btn-warning">✏️</a>
-                        <button onclick="confirmDelete({{ group.id }})" class="btn btn-sm btn-danger">🗑️</button>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="8" class="text-center text-muted">Нет групп, соответствующих фильтрам</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- Таблица групп -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Группа</th>
+                        <th>Курс</th>
+                        <th>Преподаватель</th>
+                        <th>Период обучения</th>
+                        <th class="text-center">Слушатели</th>
+                        <th>Статус</th>
+                        <th class="text-end">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for group in groups %}
+                    <tr>
+                        <td>
+                            <strong>{{ group.name }}</strong>
+                            <div class="text-muted small">{{ group.course.course_type }}</div>
+                        </td>
+                        <td>{{ group.course.course_name }}</td>
+                        <td>{{ group.teacher.surname }} {{ group.teacher.name.0 }}.</td>
+                        <td>
+                            {{ group.begin_date|date:"d.m.Y" }}<br>
+                            <small class="text-muted">до</small> {{ group.finish_date|date:"d.m.Y" }}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-primary rounded-pill">{{ group.student_count }}</span>
+                        </td>
+                        <td>
+                            <span class="status-badge 
+                                {% if group.status == 'Активна' %}status-active
+                                {% elif group.status == 'Завершена' %}status-completed
+                                {% else %}status-planned{% endif %}">
+                                {{ group.status }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'group_detail' group.id %}" class="action-btn btn-sm btn-warning me-1" style="color: #9999FF" title="Редактировать">
+                                <i class="fas fa-pencil-alt"></i>
+                            </a>
+                            <button onclick="confirmDelete({{ group.id }})" class="action-btn btn-sm btn-danger" title="Удалить">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <i class="fas fa-users-slash"></i>
+                                <h5>Группы не найдены</h5>
+                                <p>Попробуйте изменить параметры фильтрации</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
 function confirmDelete(groupId) {
-    if (confirm('Удалить группу? Это действие нельзя отменить.')) {
+    if (confirm('Вы уверены, что хотите удалить эту группу? Это действие нельзя отменить.')) {
         window.location.href = `/groups/delete/${groupId}/`;
     }
 }
 
-// Авто-отправка формы при изменении фильтров (опционально)
+// Авто-отправка формы при изменении фильтров
 document.querySelectorAll('#filterForm select').forEach(select => {
     select.addEventListener('change', function() {
         document.getElementById('filterForm').submit();

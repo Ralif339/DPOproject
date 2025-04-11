@@ -149,6 +149,22 @@
     </div>
 </div>
 
+<div class="modal fade" id="profileErrorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Ошибка подачи заявления</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Для подачи заявления необходимо заполнить все данные профиля:</p>
+                <ul id="missingFieldsList"></ul>
+                <a href="{% url 'update_info' %}" class="btn btn-primary">Перейти к редактированию профиля</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const enrollRadio = document.getElementById('enroll');
@@ -274,6 +290,8 @@
 
         // Инициализация при загрузке страницы
         updateCoursesList('enroll');
+
+        
     });
 </script>
 {% endblock content %}

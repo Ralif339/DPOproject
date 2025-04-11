@@ -181,6 +181,7 @@
     <!-- Карточки слушателей -->
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for student in students %}
+            {% if student.has_complete_profile %}
             <div class="col">
                 <div class="card student-card p-3">
                     <div class="card-body">
@@ -259,6 +260,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
         {% empty %}
             <div class="col-12">
                 <div class="alert alert-info text-center py-4">
@@ -267,6 +269,7 @@
                     <p class="mb-0">Попробуйте изменить параметры поиска</p>
                 </div>
             </div>
+            
         {% endfor %}
     </div>
 </div>

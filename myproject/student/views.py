@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from . import forms
 from dpo.models import *
 from django.utils import timezone
+from django.contrib import messages
 from django.http import JsonResponse
 
 # Create your views here.
@@ -37,7 +38,6 @@ def new_statement_view(request):
             )
             statement.save()
         return redirect('student_statements')
-
     return render(request, 'student/new_statement.html')
 
 def get_courses(request):
@@ -102,4 +102,3 @@ def student_statements_view(request):
     statements = Statements.objects.filter(student_id=request.user.id)
     return render(request, 'student/student_statements.html', context={"statements": statements,
                                                                        "today": timezone.now().date(),})
-    

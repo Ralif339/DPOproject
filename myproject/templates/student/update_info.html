@@ -148,4 +148,32 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.6/inputmask.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.6/bindings/inputmask.binding.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.6/dist/inputmask.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Маска для даты рождения
+    Inputmask('99.99.9999', {
+        placeholder: 'дд.мм.гггг'
+    }).mask(document.getElementById('{{ form.birthday.id_for_label }}'));
+    
+    // Маска для СНИЛС
+    Inputmask('999-999-999 99', {
+        placeholder: '___-___-___ __'
+    }).mask(document.getElementById('{{ form.SNILS.id_for_label }}'));
+    
+    // Маска для паспорта
+    Inputmask('9999 999999', {
+        placeholder: '____ ______'
+    }).mask(document.getElementById('{{ form.passport.id_for_label }}'));
+    
+    // Маска для телефона
+    Inputmask('+7(999)999-99-99', {
+        placeholder: '+7(___)___-__-__'
+    }).mask(document.getElementById('{{ form.phone.id_for_label }}'));
+});
+</script>
+
 {% endblock content %}

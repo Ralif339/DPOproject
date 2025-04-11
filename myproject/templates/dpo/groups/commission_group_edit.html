@@ -1,80 +1,158 @@
 {% extends "manager_navigation.html" %}
+{% load static %}
 
 {% block title %}Редактирование комиссии{% endblock title %}
 
 {% block style %}
 <style>
-    .custom-primary {
-        background-color: #9999FF !important;
-        border-color: #9999FF !important;
+    body {
+        background-color: #f8f9fa;
     }
-    .btn-custom {
-        background-color: #9999FF;
+    .section-title {
+        color: #555;
+        font-weight: 600;
+        border-bottom: 2px solid #9999FF;
+        padding-bottom: 8px;
+        margin-bottom: 30px;
+    }
+    .form-container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-control, .form-select {
+        border-radius: 5px;
+        padding: 10px 15px;
+    }
+    .form-control:focus, .form-select:focus {
         border-color: #9999FF;
+        box-shadow: 0 0 0 0.2rem rgba(153, 153, 255, 0.25);
+    }
+    .btn-primary {
+        background-color: #9999FF;
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+    .btn-primary:hover {
+        background-color: #8888EE;
         color: white;
     }
-    .btn-custom:hover {
-        background-color: #8888EE;
-        border-color: #8888EE;
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
         color: white;
+        transition: 0.3s ease;
+    }
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        color: white;
+    }
+    label {
+        font-weight: 500;
+        margin-bottom: 8px;
+        display: block;
+    }
+    .btn-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 30px;
     }
 </style>
 {% endblock style %}
 
 {% block content %}
 <div class="container mt-4">
-    <div class="card shadow">
-        <div class="card-header custom-primary text-white">
-            <h2 class="h4 mb-0">Редактирование комиссии для группы {{group.name}}</h2>
-        </div>
-        <div class="card-body">
-            <form action="{% url 'commission_group_edit' group.id %}" method="POST">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="сhairman" class="form-label">Председатель комиссии</label>
-                    <select class="form-select" name="сhairman" id="сhairman" required>
-                        <option value="" selected disabled>Выберите председателя</option>
-                        {% for member in members %}
-                            <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="deputy" class="form-label">Заместитель председателя комиссии</label>
-                    <select class="form-select" name="deputy" id="deputy" required>
-                        <option value="" selected disabled>Выберите заместителя</option>
-                        {% for member in members %}
-                            <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="secretary" class="form-label">Секретарь</label>
-                    <select class="form-select" name="secretary" id="secretary" required>
-                        <option value="" selected disabled>Выберите секретаря</option>
-                        {% for member in members %}
-                            <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="mb-4">
-                    <label for="member" class="form-label">Член комиссии</label>
-                    <select class="form-select" name="member" id="member" required>
-                        <option value="" selected disabled>Выберите члена комиссии</option>
-                        {% for member in members %}
-                            <option value="{{member.id}}">{{member.surname}} {{member.name}} {{member.patronymic}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-success btn-lg">Сохранить изменения</button>
-                </div>
-            </form>
-        </div>
+    <h2 class="section-title text-center">
+        <i class="fas fa-users-cog me-2"></i>Редактирование комиссии для группы {{ group.name }}
+    </h2>
+
+    <div class="form-container">
+        <form action="{% url 'commission_group_edit' group.id %}" method="POST" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="chairman">Председатель комиссии</label>
+                <select class="form-select" name="chairman" id="chairman" required>
+                    <option value="" disabled selected>Выберите председателя</option>
+                    {% for member in members %}
+                        <option value="{{ member.id }}">{{ member.surname }} {{ member.name }} {{ member.patronymic }}</option>
+                    {% endfor %}
+                </select>
+                <div class="invalid-feedback">Пожалуйста, выберите председателя комиссии.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="deputy">Заместитель председателя</label>
+                <select class="form-select" name="deputy" id="deputy" required>
+                    <option value="" disabled selected>Выберите заместителя</option>
+                    {% for member in members %}
+                        <option value="{{ member.id }}">{{ member.surname }} {{ member.name }} {{ member.patronymic }}</option>
+                    {% endfor %}
+                </select>
+                <div class="invalid-feedback">Пожалуйста, выберите заместителя.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="secretary">Секретарь</label>
+                <select class="form-select" name="secretary" id="secretary" required>
+                    <option value="" disabled selected>Выберите секретаря</option>
+                    {% for member in members %}
+                        <option value="{{ member.id }}">{{ member.surname }} {{ member.name }} {{ member.patronymic }}</option>
+                    {% endfor %}
+                </select>
+                <div class="invalid-feedback">Пожалуйста, выберите секретаря.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="member">Член комиссии</label>
+                <select class="form-select" name="member" id="member" required>
+                    <option value="" disabled selected>Выберите члена комиссии</option>
+                    {% for member in members %}
+                        <option value="{{ member.id }}">{{ member.surname }} {{ member.name }} {{ member.patronymic }}</option>
+                    {% endfor %}
+                </select>
+                <div class="invalid-feedback">Пожалуйста, выберите члена комиссии.</div>
+            </div>
+
+            <div class="btn-container">
+                <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Назад
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Сохранить изменения
+                </button>
+            </div>
+        </form>
     </div>
 </div>
+
+<script>
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            var forms = document.getElementsByClassName('needs-validation');
+            Array.prototype.forEach.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
 {% endblock content %}

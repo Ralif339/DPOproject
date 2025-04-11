@@ -32,11 +32,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     surname = models.CharField(max_length=255, blank=True, default='')
     patronymic = models.CharField(max_length=255, blank=True, default='Нет')
     birthday = models.DateField(blank=True, null=True)
-    SNILS = models.CharField(max_length=15, blank=True, default='Не указано')
-    passport = models.CharField(max_length=15, blank=True, default='Не указано')
-    phone = models.CharField(max_length=255, blank=True, default='Не указано')
-    address = models.CharField(max_length=255, blank=True, default='Не указано')
-    citizenship = models.CharField(max_length=255, blank=True, default='Не указано')
+    SNILS = models.CharField(max_length=15, blank=True)
+    passport = models.CharField(max_length=15, blank=True)
+    phone = models.CharField(max_length=255, blank=True)
+    address = models.CharField(max_length=255, blank=True)
+    citizenship = models.CharField(max_length=255, blank=True)
         
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
@@ -60,3 +60,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     def get_short_name(self):
         return self.name or self.email.split('@')[0]
+    
+    def has_complete_profile(self):
+        required_fields = [
+            self.name,
+            self.surname,
+            self.patronymic,
+            self.birthday,
+            self.SNILS,
+            self.passport,
+            self.phone,
+            self.address,
+            self.citizenship
+        ]
+        return all(required_fields)

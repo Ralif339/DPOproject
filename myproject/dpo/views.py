@@ -85,9 +85,11 @@ from .models import Group, StudentExpulsion
 from django.db.models.functions import Coalesce
 
 def groups_view(request):
-    # Подзапрос для отчисленных студентов
+    # Подзапрос для отчисленных студентов (исключая завершивших обучение)
     expelled_students = StudentExpulsion.objects.filter(
         group=OuterRef("id")
+    ).exclude(
+        reason="Завершение курса"
     ).values("group").annotate(count=Count("student")).values("count")
 
     # Базовый запрос
@@ -168,6 +170,7 @@ def group_detail_view(request, group_id):
                          
     expelled_students = StudentExpulsion.objects.filter(group=group).values_list("student_id", flat=True)
     student_groups = StudentGroup.objects.filter(group=group).exclude(student_id__in=expelled_students).select_related("student").order_by("student__surname")
+    expelled_students = StudentExpulsion.objects.filter(group=group)
     context ={
         "group": group, 
         "student_groups": student_groups, 
@@ -177,6 +180,7 @@ def group_detail_view(request, group_id):
         "has_exam_protocol": has_exam_protocol,
         "is_group_finished": is_group_finished,
         "students_ed_kind": students_ed_kind,
+        "expelled_students": expelled_students,
     }
     return superuser_render(request, 'dpo/groups/group_detail.html', context)
 

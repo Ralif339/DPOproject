@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
 
-
 {% block title %}{% endblock title %}
 
 {% block style %}
@@ -12,14 +11,14 @@
 <div class="container mt-2">
     <div class="row align-items-center">
         <div class="col col-md-auto">
-            <img src="{% static 'img/logo.png' %}" width="70px" height="70px" alt="">   
-            Центр ДПО
+            <a style="text-decoration: none; color: black;" class="no-dec" href="{% url "index" %}"><img src="{% static 'img/logo.png' %}" width="70px" height="70px" alt="">   
+            Центр ДПО</a>
         </div>
         <div class="col d-flex justify-content-around">
             <a href="{% url 'students' %}" class="nav-link nav-item">Слушатели</a> 
             <a href="{% url 'groups' %}" class="nav-link nav-item">Группы</a>
             <a href="{% url 'statements' %}" class="nav-link nav-item">Заявления</a>
-            <a href="{% url 'commission' %}" class="nav-link nav-item">Комиссия</a>
+            <a  href="{% url 'courses' %}"  class="nav-link nav-item">Курсы</a>
         </div>
         <div class="col col-md-auto">
             <div class="dropdown">
@@ -27,7 +26,7 @@
                     Меню
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="userMenu">
-                    <li><a class="dropdown-item" href="{% url 'courses' %}">Курсы</a></li>
+                    <li><a class="dropdown-item" href="{% url 'commission' %}">Комиссия</a></li>
                     <li><a class="dropdown-item" href="{% url 'teachers' %}">Преподаватели</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li>

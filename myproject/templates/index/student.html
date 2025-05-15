@@ -57,6 +57,29 @@
     .info-row {
         margin-bottom: 12px;
     }
+    .avatar-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .avatar-placeholder {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9999FF;
+        font-size: 75px;
+        border: 3px solid #9999FF;
+        overflow: hidden;
+    }
+    .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 </style>
 {% endblock style %}
 
@@ -68,7 +91,15 @@
     <div class="card profile-card p-4 mb-5">
         <div class="row align-items-center">
             <div class="col-md-3 text-center">
-                <img src="{% static 'img/logo.png' %}" class="rounded-circle profile-img" alt="Фото профиля">
+                <div class="avatar-container">
+                    <div class="avatar-placeholder">
+                        {% if student.photo %}
+                            <img src="{{ student.photo.url }}" alt="Фото слушателя" class="avatar-img">
+                        {% else %}
+                            <i class="fas fa-user"></i>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
             <div class="col-md-9">
                 <h3 class="mb-4">{{ user.surname }} {{ user.name }} {{ user.patronymic }}</h3>

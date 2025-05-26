@@ -262,7 +262,7 @@
                             <div class="col-md-6">
                                 <div class="info-row">
                                     <i class="fas fa-book info-icon"></i>
-                                    <strong>Курс:</strong> {{ statement.course.course_name }}
+                                    <strong>Курс:</strong> {% if statement.course %} {{ statement.course.course_name }} {% else %}{{ statement.group.course.course_name }}{% endif %}
                                 </div>
                                 <div class="info-row">
                                     <i class="fas fa-info-circle info-icon"></i>

@@ -54,7 +54,7 @@ def get_courses(request):
         existing_statements = Statements.objects.filter(
             student=user,
             statement_type="зачисление",
-            status__in=["На рассмотрении", "Отклонено"]
+            status__in=["На рассмотрении", "Отклонено", "Одобрено"]
         ).values_list('course_id', flat=True)
 
         courses = courses.exclude(id__in=existing_statements)

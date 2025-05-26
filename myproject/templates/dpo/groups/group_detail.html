@@ -258,11 +258,12 @@
             {% endif %}
             
             <!-- Список слушателей -->
+            <!-- Список слушателей -->
             <h4 class="section-title">
                 <i class="fas fa-user-graduate me-2"></i>Список слушателей
             </h4>
-            
-            {% if student_groups %}
+
+            {% if student_groups or students_ed_kind %}
             <div class="table-responsive">
                 <table class="table table-custom table-hover">
                     <thead>
@@ -270,15 +271,19 @@
                             <th>№</th>
                             <th>ФИО</th>
                             <th>Форма обучения</th>
+                            {% if group.status != "Обучение завершено" %}
                             <th>Действия</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- Активные слушатели -->
                         {% for student_group in student_groups %}
                             <tr class="text-center">
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{ student_group.student.surname }} {{ student_group.student.name }} {{ student_group.student.patronymic }}</td>
                                 <td>{{ student_group.ed_kind|default:"-" }}</td>
+                                {% if group.status != "Обучение завершено" %}
                                 <td>
                                     <button class="btn btn-danger btn-sm btn-danger-custom remove-student" 
                                         data-bs-toggle="modal" 
@@ -288,6 +293,19 @@
                                         <i class="fas fa-user-minus me-1"></i> Отчислить
                                     </button>
                                 </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        
+                        <!-- Завершившие обучение слушатели -->
+                        {% for student, ed_kind in students_ed_kind %}
+                            <tr class="text-center">
+                                <td>{{ forloop.counter|add:student_groups.count }}</td>
+                                <td>{{ student.surname }} {{ student.name }} {{ student.patronymic }}</td>
+                                <td>{{ ed_kind|default:"-" }}</td>
+                                {% if group.status != "Обучение завершено" %}
+                                <td></td>
+                                {% endif %}
                             </tr>
                         {% endfor %}
                     </tbody>

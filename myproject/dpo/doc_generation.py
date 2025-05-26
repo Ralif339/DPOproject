@@ -51,7 +51,7 @@ def set_cell_borders(cell):
 
 def get_enroll_docx(group_id, number, date):
     group = Group.objects.get(id=group_id)
-    expelled_students = StudentExpulsion.objects.filter(group=group).values_list("student_id", flat=True)
+    expelled_students = StudentExpulsion.objects.filter(group=group).exclude(reason="Завершение курса").values_list("student_id", flat=True)
     student_groups = StudentGroup.objects.filter(group=group).exclude(student_id__in=expelled_students).select_related("student").order_by("student__surname")
     document = docx.Document('dpo/docs_patterns/enroll.docx')
     table1 = document.tables[0]
@@ -118,7 +118,7 @@ def get_enroll_docx(group_id, number, date):
 
 def get_commission_docx(group_id, number, date):
     group = Group.objects.get(id=group_id)
-    expelled_students = StudentExpulsion.objects.filter(group=group).values_list("student_id", flat=True)
+    expelled_students = StudentExpulsion.objects.filter(group=group).exclude(reason="Завершение курса").values_list("student_id", flat=True)
     student_groups = StudentGroup.objects.filter(group=group).exclude(student_id__in=expelled_students).select_related("student").order_by("student__surname")
     document = docx.Document('dpo/docs_patterns/commission.docx')
     
@@ -203,7 +203,7 @@ def get_commission_docx(group_id, number, date):
 
 def get_lesson_log_docx(group_id):
     group = Group.objects.get(id=group_id)
-    expelled_students = StudentExpulsion.objects.filter(group=group).values_list("student_id", flat=True)
+    expelled_students = StudentExpulsion.objects.filter(group=group).exclude(reason="Завершение курса").values_list("student_id", flat=True)
     student_groups = StudentGroup.objects.filter(group=group).exclude(student_id__in=expelled_students).select_related("student").order_by("student__surname")
     document = docx.Document('dpo/docs_patterns/lesson_log.docx')
     
@@ -214,7 +214,7 @@ def get_lesson_log_docx(group_id):
         run.italic = True
         
     p = document.paragraphs[2]
-    replace_text(p, "<TeacherFIO>", f"{group.teacher.surname} {group.teacher.name}. {group.teacher.patronymic}.", 12)
+    replace_text(p, "<TeacherFIO>", f"{group.teacher.surname} {group.teacher.name[0]}. {group.teacher.patronymic[0]}.", 12)
     for run in p.runs:
         run.font.name = "GOST type A"
         run.italic = True
@@ -247,7 +247,7 @@ def get_lesson_log_docx(group_id):
 
 def get_protocol_docx(group_id, doc_number, date):
     group = Group.objects.get(id=group_id)
-    expelled_students = StudentExpulsion.objects.filter(group=group).values_list("student_id", flat=True)
+    expelled_students = StudentExpulsion.objects.filter(group=group).exclude(reason="Завершение курса").values_list("student_id", flat=True)
     student_groups = StudentGroup.objects.filter(group=group).exclude(student_id__in=expelled_students).select_related("student").order_by("student__surname")
     document = docx.Document('dpo/docs_patterns/protocol.docx')
     # Преобразуем строку в объект datetime
@@ -348,7 +348,7 @@ def get_protocol_docx(group_id, doc_number, date):
 
 def get_exam_sheet_docx(group_id, doc_number, date, order):
     group = Group.objects.get(id=group_id)
-    expelled_students = StudentExpulsion.objects.filter(group=group).values_list("student_id", flat=True)
+    expelled_students = StudentExpulsion.objects.filter(group=group).exclude(reason="Завершение курса").values_list("student_id", flat=True)
     student_groups = StudentGroup.objects.filter(group=group).exclude(student_id__in=expelled_students).select_related("student").order_by("student__surname")
     document = docx.Document('dpo/docs_patterns/exam_sheet.docx')
 

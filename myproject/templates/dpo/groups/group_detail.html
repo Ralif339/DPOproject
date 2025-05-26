@@ -103,6 +103,11 @@
         border-color: #9999FF;
         box-shadow: 0 0 0 0.25rem rgba(153, 153, 255, 0.25);
     }
+    
+    .edit-group-btn-container {
+        margin-top: 1rem;
+        margin-bottom: 1.5rem;
+    }
 </style>
 {% endblock style %}
 
@@ -136,6 +141,13 @@
                         {{group.teacher.surname}} {{group.teacher.name}} {{group.teacher.patronymic}}
                     </p>
                 </div>
+            </div>
+
+            <!-- Кнопка редактирования группы -->
+            <div class="edit-group-btn-container">
+                <a href="{% url 'edit_group' group.id %}" class="btn btn-warning-custom">
+                    <i class="fas fa-edit me-1"></i> Редактировать данные группы
+                </a>
             </div>
 
             <!-- Действия с группой -->
@@ -257,7 +269,6 @@
             </div>
             {% endif %}
             
-            <!-- Список слушателей -->
             <!-- Список слушателей -->
             <h4 class="section-title">
                 <i class="fas fa-user-graduate me-2"></i>Список слушателей

@@ -184,6 +184,26 @@ def group_detail_view(request, group_id):
     }
     return superuser_render(request, 'dpo/groups/group_detail.html', context)
 
+def edit_group_view(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+    
+    if request.method == "POST":
+        form = GroupAddForm(request.POST, instance=group)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Данные группы успешно обновлены")
+            return redirect('group_detail', group_id=group.id)
+        else:
+            messages.error(request, "Пожалуйста, исправьте ошибки в форме")
+    else:
+        form = GroupAddForm(instance=group)
+    
+    context = {
+        'form': form,
+        'group': group,
+    }
+    return superuser_render(request, 'dpo/groups/group_edit.html', context)
+
 def finish_course(request, group_id):
     group = get_object_or_404(Group, id=group_id)
 

@@ -8,6 +8,7 @@ urlpatterns = [
     path('student_edit/<int:student_id>/', student_edit_view, name="student_edit"),
     path('groups/', groups_view, name="groups"),
     path('group/<int:group_id>', group_detail_view, name="group_detail"),
+    path('groups/edit/<int:group_id>/', edit_group_view, name='edit_group'),
     path('commission_group_add/<int:group_id>', commission_group_add_view, name="commission_group_add"),
     path('commission_group_edit/<int:group_id>', commission_group_edit_view, name="commission_group_edit"),
     path('statements/', statements_view, name="statements"),
